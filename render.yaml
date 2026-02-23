@@ -1,0 +1,20 @@
+databases:
+  - name: taide-db
+    plan: free
+    databaseName: taide
+    user: taide
+
+services:
+  - type: web
+    name: taide
+    plan: free
+    runtime: python
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taide-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.13.1"

@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Täide - Ülejääva täitematerjali jagamine</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2d6a4f;
+            --primary-light: #40916c;
+            --primary-dark: #1b4332;
+            --accent: #d4a373;
+            --accent-light: #e9c46a;
+            --bg: #fefae0;
+            --bg-card: #ffffff;
+            --text: #1b1b1b;
+            --text-light: #6b7280;
+            --border: #d1d5db;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-dark);
+            color: white;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: var(--primary-dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: var(--accent-light);
+            transform: translateY(-1px);
+        }
+
+        /* Filter bar */
+        .filter-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+        }
+
+        .filter-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 7px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 14px 8px 36px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-box::before {
+            content: "\1F50D";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        /* Main layout */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: calc(100vh - 120px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Map */
+        .map-container {
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+        }
+
+        /* Listings panel */
+        .listings-panel {
+            overflow-y: auto;
+            padding: 16px;
+            background: #f5f1e3;
+        }
+
+        .listings-count {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .listing-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .listing-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+        }
+
+        .listing-card.highlighted {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .listing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .listing-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .material-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-kivi { background: #e2e8f0; color: #475569; }
+        .badge-liiv { background: #fef3c7; color: #92400e; }
+        .badge-muld { background: #d1fae5; color: #065f46; }
+        .badge-purustatud_betoon { background: #e5e7eb; color: #374151; }
+        .badge-kruus { background: #fce7f3; color: #9d174d; }
+        .badge-muu { background: #ede9fe; color: #5b21b6; }
+
+        .listing-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .listing-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .listing-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .listing-contact {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 12px;
+            display: none;
+        }
+
+        .listing-card.expanded .listing-contact {
+            display: block;
+        }
+
+        .listing-contact p {
+            margin-bottom: 4px;
+            color: var(--text-light);
+        }
+
+        .listing-contact a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .price-tag {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .price-tag.free {
+            color: #059669;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--primary-dark);
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .form-group label .required {
+            color: #dc2626;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 20px 0 12px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+
+        .form-help {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-cancel {
+            padding: 12px 24px;
+            background: #f3f4f6;
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        /* Mini map in modal */
+        #modal-map {
+            height: 200px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            margin-top: 6px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary-dark);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 3000;
+            transition: transform 0.3s;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .map-container {
+                height: 50vh;
+            }
+
+            .listings-panel {
+                min-height: 50vh;
+            }
+
+            .header-inner {
+                padding: 10px 14px;
+            }
+
+            .logo h1 {
+                font-size: 20px;
+            }
+
+            .filter-inner {
+                gap: 6px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 20px;
+            }
+        }
+
+        /* Leaflet popup custom */
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 12px 16px !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .popup-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Custom marker */
+        .custom-marker {
+            background: var(--primary);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">&#9968;</div>
+                <div>
+                    <h1>Täide</h1>
+                    <div class="logo-subtitle">Jaga ülejäävat täitematerjali</div>
+                </div>
+            </div>
+            <button class="btn-add" onclick="openModal()">
+                <span>+</span> Lisa kuulutus
+            </button>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+        <div class="filter-inner">
+            <button class="filter-btn active" data-type="koik" onclick="setFilter(this)">&#128205; Kõik</button>
+            <button class="filter-btn" data-type="kivi" onclick="setFilter(this)">&#129704; Kivi</button>
+            <button class="filter-btn" data-type="liiv" onclick="setFilter(this)">&#9201; Liiv</button>
+            <button class="filter-btn" data-type="muld" onclick="setFilter(this)">&#127793; Muld</button>
+            <button class="filter-btn" data-type="purustatud_betoon" onclick="setFilter(this)">&#129521; Betoon</button>
+            <button class="filter-btn" data-type="kruus" onclick="setFilter(this)">&#11036; Kruus</button>
+            <button class="filter-btn" data-type="muu" onclick="setFilter(this)">&#128230; Muu</button>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Otsi materjali, asukohta..." oninput="debounceSearch()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+        <div class="listings-panel">
+            <div class="listings-count" id="listingsCount"></div>
+            <div id="listingsList"></div>
+        </div>
+    </div>
+
+    <!-- Add listing modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+        <div class="modal">
+            <h2>&#10133; Lisa kuulutus</h2>
+            <p class="modal-subtitle">Jaga oma ülejäävat täitematerjali teistega</p>
+
+            <form id="listingForm" onsubmit="submitListing(event)">
+                <!-- Material info -->
+                <div class="form-group">
+                    <label>Materjali tüüp <span class="required">*</span></label>
+                    <select name="material_type" required>
+                        <option value="">Vali materjali tüüp...</option>
+                        <option value="kivi">Kivi</option>
+                        <option value="liiv">Liiv</option>
+                        <option value="muld">Muld / kasvumuld</option>
+                        <option value="purustatud_betoon">Purustatud betoon</option>
+                        <option value="kruus">Kruus</option>
+                        <option value="muu">Muu</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Pealkiri <span class="required">*</span></label>
+                    <input type="text" name="title" placeholder="nt. Ehitusliiv tasuta, tule ise järele" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Kirjeldus</label>
+                    <textarea name="description" placeholder="Kirjelda materjali lähemalt - kogus, kvaliteet, tingimused..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kogus (ligikaudne)</label>
+                        <input type="text" name="quantity" placeholder="nt. ~5">
+                    </div>
+                    <div class="form-group">
+                        <label>Ühik</label>
+                        <select name="unit">
+                            <option value="tonni">tonni</option>
+                            <option value="m3">m&sup3;</option>
+                            <option value="kotti">kotti</option>
+                            <option value="koormaid">koormaid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Hind</label>
+                    <select name="price_type">
+                        <option value="tasuta">Tasuta</option>
+                        <option value="kokkuleppel">Hind kokkuleppel</option>
+                    </select>
+                </div>
+
+                <!-- Contact -->
+                <div class="form-section-title">&#128100; Kontaktandmed</div>
+
+                <div class="form-group">
+                    <label>Nimi <span class="required">*</span></label>
+                    <input type="text" name="contact_name" placeholder="Sinu nimi" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <input type="tel" name="contact_phone" placeholder="+372 5xx xxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>E-post</label>
+                        <input type="email" name="contact_email" placeholder="email@example.ee">
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="form-section-title">&#128205; Asukoht</div>
+
+                <div class="form-group">
+                    <label>Aadress <span class="required">*</span></label>
+                    <input type="text" name="address" id="addressInput" placeholder="Tänav, linn" required>
+                    <div class="form-help">Kliki kaardil asukoha määramiseks või sisesta aadress</div>
+                </div>
+
+                <div class="form-group">
+                    <div id="modal-map"></div>
+                    <input type="hidden" name="latitude" id="latInput">
+                    <input type="hidden" name="longitude" id="lngInput">
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Tühista</button>
+                    <button type="submit" class="btn-submit">&#10004; Lisa kuulutus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // --- State ---
+        let map, modalMap, modalMarker;
+        let markers = [];
+        let currentFilter = 'koik';
+        let searchTimeout;
+        let listings = [];
+
+        // Material labels
+        const materialLabels = {
+            'kivi': 'Kivi',
+            'liiv': 'Liiv',
+            'muld': 'Muld',
+            'purustatud_betoon': 'Betoon',
+            'kruus': 'Kruus',
+            'muu': 'Muu'
+        };
+
+        const materialEmojis = {
+            'kivi': '\u{1F9F1}',
+            'liiv': '\u23F1',
+            'muld': '\u{1F331}',
+            'purustatud_betoon': '\u{1F9F1}',
+            'kruus': '\u2B1C',
+            'muu': '\u{1F4E6}'
+        };
+
+        // Marker colors per type
+        const markerColors = {
+            'kivi': '#64748b',
+            'liiv': '#d97706',
+            'muld': '#059669',
+            'purustatud_betoon': '#6b7280',
+            'kruus': '#db2777',
+            'muu': '#7c3aed'
+        };
+
+        // --- Initialize map ---
+        function initMap() {
+            map = L.map('map').setView([58.8, 25.5], 7);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap',
+                maxZoom: 18
+            }).addTo(map);
+
+            loadListings();
+        }
+
+        // --- Create colored marker ---
+        function createMarkerIcon(type) {
+            const color = markerColors[type] || '#2d6a4f';
+            return L.divIcon({
+                className: '',
+                html: `<div style="
+                    width: 28px; height: 28px;
+                    background: ${color};
+                    border: 3px solid white;
+                    border-radius: 50%;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 13px;
+                ">${materialEmojis[type] || '📍'}</div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14],
+                popupAnchor: [0, -16]
+            });
+        }
+
+        // --- Load listings from API ---
+        async function loadListings() {
+            try {
+                const params = new URLSearchParams();
+                if (currentFilter !== 'koik') params.set('material_type', currentFilter);
+                const search = document.getElementById('searchInput').value.trim();
+                if (search) params.set('search', search);
+
+                const res = await fetch('/api/listings?' + params.toString());
+                listings = await res.json();
+
+                renderListings();
+                renderMarkers();
+            } catch (err) {
+                console.error('Viga kuulutuste laadimisel:', err);
+            }
+        }
+
+        // --- Render listing cards ---
+        function renderListings() {
+            const container = document.getElementById('listingsList');
+            const countEl = document.getElementById('listingsCount');
+
+            countEl.textContent = `${listings.length} kuulutus${listings.length !== 1 ? 't' : ''}`;
+
+            if (listings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">&#128270;</div>
+                        <p>Kuulutusi ei leitud</p>
+                        <p style="font-size:12px; margin-top:8px;">Proovi teist filtrit või lisa uus kuulutus</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = listings.map(l => `
+                <div class="listing-card" id="card-${l.id}" onclick="toggleCard(${l.id})">
+                    <div class="listing-header">
+                        <div class="listing-title">${escapeHtml(l.title)}</div>
+                        <span class="material-badge badge-${l.material_type}">${materialLabels[l.material_type] || l.material_type}</span>
+                    </div>
+                    ${l.description ? `<div class="listing-desc">${escapeHtml(l.description)}</div>` : ''}
+                    <div class="listing-meta">
+                        <span>&#128205; ${escapeHtml(l.address)}</span>
+                        ${l.quantity ? `<span>&#128230; ${escapeHtml(l.quantity)} ${escapeHtml(l.unit || '')}</span>` : ''}
+                        <span class="price-tag ${l.price_type === 'tasuta' ? 'free' : ''}">
+                            ${l.price_type === 'tasuta' ? '&#10004; Tasuta' : '&#128176; Hind kokkuleppel'}
+                        </span>
+                    </div>
+                    <div class="listing-contact">
+                        <p><strong>${escapeHtml(l.contact_name)}</strong></p>
+                        ${l.contact_phone ? `<p>&#128222; <a href="tel:${l.contact_phone}">${escapeHtml(l.contact_phone)}</a></p>` : ''}
+                        ${l.contact_email ? `<p>&#9993; <a href="mailto:${l.contact_email}">${escapeHtml(l.contact_email)}</a></p>` : ''}
+                        <p style="font-size:11px;color:#999;margin-top:6px;">Lisatud: ${new Date(l.created_at).toLocaleDateString('et-EE')}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Render markers on map ---
+        function renderMarkers() {
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            listings.forEach(l => {
+                if (!l.latitude || !l.longitude) return;
+
+                const marker = L.marker([l.latitude, l.longitude], {
+                    icon: createMarkerIcon(l.material_type)
+                }).addTo(map);
+
+                marker.bindPopup(`
+                    <div class="popup-title">${escapeHtml(l.title)}</div>
+                    <div class="popup-info">
+                        <strong>${materialLabels[l.material_type] || l.material_type}</strong><br>
+                        ${escapeHtml(l.address)}<br>
+                        ${l.quantity ? l.quantity + ' ' + (l.unit || '') + '<br>' : ''}
+                        <strong style="color:${l.price_type === 'tasuta' ? '#059669' : '#d97706'}">
+                            ${l.price_type === 'tasuta' ? 'Tasuta' : 'Hind kokkuleppel'}
+                        </strong><br>
+                        ${l.contact_phone ? '&#128222; ' + escapeHtml(l.contact_phone) + '<br>' : ''}
+                        ${l.contact_email ? '&#9993; ' + escapeHtml(l.contact_email) : ''}
+                    </div>
+                `);
+
+                marker.on('click', () => {
+                    highlightCard(l.id);
+                });
+
+                marker.listingId = l.id;
+                markers.push(marker);
+            });
+
+            // Fit bounds if listings exist
+            if (markers.length > 0) {
+                const group = L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // --- Card interactions ---
+        function toggleCard(id) {
+            const card = document.getElementById(`card-${id}`);
+            const wasExpanded = card.classList.contains('expanded');
+
+            // Close all
+            document.querySelectorAll('.listing-card.expanded').forEach(c => c.classList.remove('expanded'));
+
+            if (!wasExpanded) {
+                card.classList.add('expanded');
+            }
+
+            // Pan map to listing
+            const listing = listings.find(l => l.id === id);
+            if (listing && listing.latitude && listing.longitude) {
+                map.setView([listing.latitude, listing.longitude], 14, { animate: true });
+                // Open popup
+                markers.forEach(m => {
+                    if (m.listingId === id) m.openPopup();
+                });
+            }
+        }
+
+        function highlightCard(id) {
+            document.querySelectorAll('.listing-card.highlighted').forEach(c => c.classList.remove('highlighted'));
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                card.classList.add('highlighted');
+                card.classList.add('expanded');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // --- Filters ---
+        function setFilter(btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.type;
+            loadListings();
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(loadListings, 300);
+        }
+
+        // --- Modal ---
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Initialize modal map
+            setTimeout(() => {
+                if (!modalMap) {
+                    modalMap = L.map('modal-map').setView([59.437, 24.7536], 11);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OSM',
+                        maxZoom: 18
+                    }).addTo(modalMap);
+
+                    modalMap.on('click', function(e) {
+                        const { lat, lng } = e.latlng;
+                        document.getElementById('latInput').value = lat.toFixed(6);
+                        document.getElementById('lngInput').value = lng.toFixed(6);
+
+                        if (modalMarker) {
+                            modalMarker.setLatLng(e.latlng);
+                        } else {
+                            modalMarker = L.marker(e.latlng).addTo(modalMap);
+                        }
+                    });
+                } else {
+                    modalMap.invalidateSize();
+                }
+            }, 100);
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('listingForm').reset();
+            if (modalMarker) {
+                modalMap.removeLayer(modalMarker);
+                modalMarker = null;
+            }
+            document.getElementById('latInput').value = '';
+            document.getElementById('lngInput').value = '';
+        }
+
+        function closeModalOutside(e) {
+            if (e.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        }
+
+        // --- Submit listing ---
+        async function submitListing(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const lat = document.getElementById('latInput').value;
+            const lng = document.getElementById('lngInput').value;
+
+            if (!lat || !lng) {
+                showToast('&#9888; Palun kliki kaardil asukoha määramiseks!');
+                return;
+            }
+
+            const data = {
+                material_type: form.material_type.value,
+                title: form.title.value,
+                description: form.description.value,
+                quantity: form.quantity.value,
+                unit: form.unit.value,
+                price_type: form.price_type.value,
+                contact_name: form.contact_name.value,
+                contact_phone: form.contact_phone.value,
+                contact_email: form.contact_email.value,
+                address: form.address.value,
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lng)
+            };
+
+            try {
+                const res = await fetch('/api/listings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    closeModal();
+                    showToast('&#10004; Kuulutus edukalt lisatud!');
+                    loadListings();
+                } else {
+                    const err = await res.json();
+                    showToast('&#9888; Viga: ' + (err.error || 'Midagi läks valesti'));
+                }
+            } catch (err) {
+                showToast('&#9888; Võrgu viga, proovi uuesti');
+            }
+        }
+
+        // --- Toast ---
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // --- Helpers ---
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>
