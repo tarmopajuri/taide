@@ -229,8 +229,11 @@ def delete_listing(listing_id):
 def health():
     return jsonify({'status': 'ok'})
 
-if __name__ == '__main__':
+# --- Initialize DB on startup (works with gunicorn too) ---
+with app.app_context():
     init_db()
+
+if __name__ == '__main__':
     print("")
     print("=== Taide server tootab! ===")
     print("Ava brauseris: http://localhost:5000")
