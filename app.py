@@ -3,16 +3,22 @@ Taide - Ulejaava taitematerjali jagamise platvorm
 taide.ee
 """
 import os
-import json
-from datetime import datetime
-from flask import Flask, request, jsonify, render_template, g
+import uuid
+from flask import Flask, request, jsonify, render_template, g, session
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app)
+app.secret_key = os.environ.get('SECRET_KEY', 'taide-dev-secret-key-change-me')
+
+# --- Upload config ---
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --- Database config ---
-# Use PostgreSQL if DATABASE_URL is set (Render), otherwise SQLite (local)
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 def is_postgres():
@@ -23,7 +29,6 @@ def get_db():
         if is_postgres():
             import psycopg2
             import psycopg2.extras
-            # Render uses postgresql:// but psycopg2 needs postgresql://
             db_url = DATABASE_URL
             if db_url.startswith('postgres://'):
                 db_url = db_url.replace('postgres://', 'postgresql://', 1)
@@ -41,7 +46,6 @@ def db_execute(query, params=None):
     """Execute query with proper placeholder for PostgreSQL (%s) or SQLite (?)"""
     db = get_db()
     if is_postgres():
-        # Convert ? placeholders to %s for PostgreSQL
         query = query.replace('?', '%s')
         import psycopg2.extras
         cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -59,7 +63,7 @@ def db_commit():
 
 def db_fetchall(cursor):
     if is_postgres():
-        return cursor.fetchall()  # Already returns dicts with RealDictCursor
+        return cursor.fetchall()
     else:
         return [dict(row) for row in cursor.fetchall()]
 
@@ -76,6 +80,17 @@ def close_db(exception):
     if db is not None:
         db.close()
 
+# --- Auth helper ---
+def get_current_user():
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    cur = db_execute("SELECT id, email, username, role, created_at FROM users WHERE id = ?", (user_id,))
+    return db_fetchone(cur)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # --- Initialize database ---
 def init_db():
     if is_postgres():
@@ -85,6 +100,16 @@ def init_db():
             db_url = db_url.replace('postgres://', 'postgresql://', 1)
         db = psycopg2.connect(db_url)
         cur = db.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                username TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT DEFAULT 'user',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS listings (
                 id SERIAL PRIMARY KEY,
@@ -103,11 +128,14 @@ def init_db():
                 longitude REAL NOT NULL,
                 image_url TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                is_active INTEGER DEFAULT 1
+                is_active INTEGER DEFAULT 1,
+                user_id INTEGER
             )
         """)
+        cur.execute("ALTER TABLE listings ADD COLUMN IF NOT EXISTS user_id INTEGER")
         db.commit()
-        # Check if empty
+        cur.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
+        admin_count = cur.fetchone()[0]
         cur.execute("SELECT COUNT(*) FROM listings")
         count = cur.fetchone()[0]
     else:
@@ -115,6 +143,16 @@ def init_db():
         db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'taide.db')
         db = sqlite3.connect(db_path)
         cur = db.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                username TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT DEFAULT 'user',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS listings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -133,14 +171,30 @@ def init_db():
                 longitude REAL NOT NULL,
                 image_url TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                is_active INTEGER DEFAULT 1
+                is_active INTEGER DEFAULT 1,
+                user_id INTEGER
             )
         """)
+        try:
+            cur.execute("ALTER TABLE listings ADD COLUMN user_id INTEGER")
+        except Exception:
+            pass
         db.commit()
+        cur.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
+        admin_count = cur.fetchone()[0]
         cur.execute("SELECT COUNT(*) FROM listings")
         count = cur.fetchone()[0]
 
-    # Add sample data if empty
+    # Create default admin
+    if admin_count == 0:
+        ph = '%s' if is_postgres() else '?'
+        cur.execute(
+            f"INSERT INTO users (email, username, password_hash, role) VALUES ({ph}, {ph}, {ph}, {ph})",
+            ('admin@taide.ee', 'Admin', generate_password_hash('admin123'), 'admin')
+        )
+        db.commit()
+
+    # Sample data
     if count == 0:
         sample_data = [
             ('kivi', 'Suuremad maakivid', 'Majaehitusest ule jaanud maakivid, sobivad haljastusse voi muuri ehituseks.', '~5', 'tonni', 'tasuta', 0, 'Mart Tamm', '+372 5551 2345', 'mart@email.ee', 'Parnu mnt 45, Tallinn', 59.4310, 24.7421, ''),
@@ -168,6 +222,66 @@ def init_db():
 def index():
     return render_template('index.html')
 
+# --- Auth routes ---
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = (data.get('email') or '').strip().lower()
+    username = (data.get('username') or '').strip()
+    password = data.get('password') or ''
+
+    if not email or not username or not password:
+        return jsonify({'error': 'Koik valjad on kohustuslikud'}), 400
+    if len(password) < 6:
+        return jsonify({'error': 'Parool peab olema vahemalt 6 marki'}), 400
+
+    cur = db_execute("SELECT id FROM users WHERE email = ?", (email,))
+    if db_fetchone(cur):
+        return jsonify({'error': 'See e-posti aadress on juba kasutusel'}), 400
+
+    db_execute("INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)",
+               (email, username, generate_password_hash(password)))
+    db_commit()
+
+    cur = db_execute("SELECT id, email, username, role FROM users WHERE email = ?", (email,))
+    user = db_fetchone(cur)
+    session['user_id'] = user['id']
+    return jsonify({'success': True, 'user': user}), 201
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+
+    if not email or not password:
+        return jsonify({'error': 'E-post ja parool on kohustuslikud'}), 400
+
+    cur = db_execute("SELECT id, email, username, password_hash, role FROM users WHERE email = ?", (email,))
+    user = db_fetchone(cur)
+
+    if not user or not check_password_hash(user['password_hash'], password):
+        return jsonify({'error': 'Vale e-post voi parool'}), 401
+
+    session['user_id'] = user['id']
+    return jsonify({'success': True, 'user': {
+        'id': user['id'], 'email': user['email'],
+        'username': user['username'], 'role': user['role']
+    }})
+
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({'success': True})
+
+@app.route('/api/auth/me', methods=['GET'])
+def me():
+    user = get_current_user()
+    if user:
+        return jsonify({'user': user})
+    return jsonify({'user': None})
+
+# --- Listings routes ---
 @app.route('/api/listings', methods=['GET'])
 def get_listings():
     material_type = request.args.get('material_type', '')
@@ -196,40 +310,108 @@ def get_listings():
 
 @app.route('/api/listings', methods=['POST'])
 def create_listing():
-    data = request.get_json()
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Pead olema sisse logitud'}), 401
 
+    data = request.get_json()
     required = ['material_type', 'title', 'contact_name', 'address', 'latitude', 'longitude']
     for field in required:
         if not data.get(field):
-            return jsonify({'error': f'Field "{field}" is required'}), 400
+            return jsonify({'error': f'Vali "{field}" on kohustuslik'}), 400
 
     db_execute("""
         INSERT INTO listings (material_type, title, description, quantity, unit, price_type, price,
-            contact_name, contact_phone, contact_email, address, latitude, longitude, image_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            contact_name, contact_phone, contact_email, address, latitude, longitude, image_url, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         data['material_type'], data['title'], data.get('description', ''),
         data.get('quantity', ''), data.get('unit', 'tonni'),
         data.get('price_type', 'tasuta'), data.get('price', 0),
         data['contact_name'], data.get('contact_phone', ''),
         data.get('contact_email', ''), data['address'],
-        data['latitude'], data['longitude'], data.get('image_url', '')
+        data['latitude'], data['longitude'], data.get('image_url', ''),
+        user['id']
     ))
     db_commit()
     return jsonify({'success': True, 'message': 'Kuulutus lisatud!'}), 201
 
 @app.route('/api/listings/<int:listing_id>', methods=['DELETE'])
 def delete_listing(listing_id):
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Pead olema sisse logitud'}), 401
+
+    cur = db_execute("SELECT user_id FROM listings WHERE id = ? AND is_active = 1", (listing_id,))
+    listing = db_fetchone(cur)
+
+    if not listing:
+        return jsonify({'error': 'Kuulutust ei leitud'}), 404
+
+    if listing.get('user_id') != user['id'] and user['role'] != 'admin':
+        return jsonify({'error': 'Sul pole oigust seda kustutada'}), 403
+
     db_execute("UPDATE listings SET is_active = 0 WHERE id = ?", (listing_id,))
     db_commit()
     return jsonify({'success': True})
 
-# --- Health check for Render ---
+# --- Upload ---
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Pead olema sisse logitud'}), 401
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'Faili ei leitud'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Faili ei valitud'}), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'Lubatud: jpg, png, webp'}), 400
+
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
+    return jsonify({'success': True, 'image_url': f'/static/uploads/{filename}'})
+
+# --- Admin routes ---
+@app.route('/api/admin/listings', methods=['GET'])
+def admin_listings():
+    user = get_current_user()
+    if not user or user['role'] != 'admin':
+        return jsonify({'error': 'Ainult admin'}), 403
+
+    cur = db_execute("SELECT * FROM listings ORDER BY created_at DESC")
+    return jsonify(db_fetchall(cur))
+
+@app.route('/api/admin/users', methods=['GET'])
+def admin_users():
+    user = get_current_user()
+    if not user or user['role'] != 'admin':
+        return jsonify({'error': 'Ainult admin'}), 403
+
+    cur = db_execute("SELECT id, email, username, role, created_at FROM users ORDER BY created_at DESC")
+    return jsonify(db_fetchall(cur))
+
+@app.route('/api/admin/listings/<int:listing_id>', methods=['DELETE'])
+def admin_delete_listing(listing_id):
+    user = get_current_user()
+    if not user or user['role'] != 'admin':
+        return jsonify({'error': 'Ainult admin'}), 403
+
+    db_execute("DELETE FROM listings WHERE id = ?", (listing_id,))
+    db_commit()
+    return jsonify({'success': True})
+
+# --- Health check ---
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok'})
 
-# --- Initialize DB on startup (works with gunicorn too) ---
+# --- Initialize DB on startup ---
 with app.app_context():
     init_db()
 
@@ -237,5 +419,6 @@ if __name__ == '__main__':
     print("")
     print("=== Taide server tootab! ===")
     print("Ava brauseris: http://localhost:5000")
+    print("Admin: admin@taide.ee / admin123")
     print("")
     app.run(debug=True, host='0.0.0.0', port=5000)

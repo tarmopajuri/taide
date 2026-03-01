@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Täide - Ülejääva täitematerjali jagamine</title>
+    <title>Taide - Ulejaava taitematerjali jagamine</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #2d6a4f;
@@ -76,16 +72,14 @@
             font-size: 22px;
         }
 
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
+        .logo h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-subtitle { font-size: 11px; opacity: 0.7; font-weight: 400; }
 
-        .logo-subtitle {
-            font-size: 11px;
-            opacity: 0.7;
-            font-weight: 400;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn-add {
@@ -101,12 +95,54 @@
             align-items: center;
             gap: 6px;
             transition: all 0.2s;
+            font-family: inherit;
         }
 
-        .btn-add:hover {
-            background: var(--accent-light);
-            transform: translateY(-1px);
+        .btn-add:hover { background: var(--accent-light); transform: translateY(-1px); }
+
+        .btn-auth {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
         }
+
+        .btn-auth:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+        .btn-auth-primary {
+            background: var(--accent);
+            color: var(--primary-dark);
+            border-color: var(--accent);
+        }
+
+        .btn-auth-primary:hover { background: var(--accent-light); border-color: var(--accent-light); }
+
+        .user-name {
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-admin {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-admin:hover { background: #6d28d9; }
 
         /* Filter bar */
         .filter-bar {
@@ -136,16 +172,8 @@
             white-space: nowrap;
         }
 
-        .filter-btn:hover {
-            border-color: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .filter-btn:hover { border-color: var(--primary-light); color: var(--primary); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         .search-box {
             flex: 1;
@@ -164,9 +192,7 @@
             transition: border-color 0.2s;
         }
 
-        .search-box input:focus {
-            border-color: var(--primary);
-        }
+        .search-box input:focus { border-color: var(--primary); }
 
         .search-box::before {
             content: "\1F50D";
@@ -186,16 +212,8 @@
             margin: 0 auto;
         }
 
-        /* Map */
-        .map-container {
-            position: relative;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-        }
+        .map-container { position: relative; }
+        #map { width: 100%; height: 100%; min-height: 400px; }
 
         /* Listings panel */
         .listings-panel {
@@ -222,15 +240,20 @@
             border: 2px solid transparent;
         }
 
-        .listing-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-            border-color: var(--primary-light);
+        .listing-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); border-color: var(--primary-light); }
+        .listing-card.highlighted { border-color: var(--primary); box-shadow: var(--shadow-lg); }
+
+        .listing-image {
+            margin: -16px -16px 12px -16px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            overflow: hidden;
         }
 
-        .listing-card.highlighted {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-lg);
+        .listing-image img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
         }
 
         .listing-header {
@@ -241,11 +264,7 @@
             margin-bottom: 8px;
         }
 
-        .listing-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-        }
+        .listing-title { font-size: 16px; font-weight: 700; color: var(--text); }
 
         .material-badge {
             padding: 3px 10px;
@@ -279,11 +298,7 @@
             color: var(--text-light);
         }
 
-        .listing-meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .listing-meta span { display: flex; align-items: center; gap: 4px; }
 
         .listing-contact {
             margin-top: 10px;
@@ -293,30 +308,28 @@
             display: none;
         }
 
-        .listing-card.expanded .listing-contact {
-            display: block;
-        }
+        .listing-card.expanded .listing-contact { display: block; }
+        .listing-contact p { margin-bottom: 4px; color: var(--text-light); }
+        .listing-contact a { color: var(--primary); text-decoration: none; font-weight: 600; }
 
-        .listing-contact p {
-            margin-bottom: 4px;
-            color: var(--text-light);
-        }
+        .price-tag { color: var(--primary); font-weight: 700; font-size: 14px; }
+        .price-tag.free { color: #059669; }
 
-        .listing-contact a {
-            color: var(--primary);
-            text-decoration: none;
+        .btn-delete {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+            font-family: inherit;
         }
 
-        .price-tag {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .price-tag.free {
-            color: #059669;
-        }
+        .btn-delete:hover { background: #dc2626; color: white; }
 
         /* Modal */
         .modal-overlay {
@@ -330,9 +343,7 @@
             padding: 20px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
             background: white;
@@ -345,34 +356,12 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        .modal h2 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            color: var(--primary-dark);
-        }
+        .modal h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; color: var(--primary-dark); }
+        .modal-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
 
-        .modal-subtitle {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--text);
-        }
-
-        .form-group label .required {
-            color: #dc2626;
-        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+        .form-group label .required { color: #dc2626; }
 
         .form-group input,
         .form-group textarea,
@@ -389,20 +378,10 @@
 
         .form-group input:focus,
         .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--primary);
-        }
+        .form-group select:focus { border-color: var(--primary); }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         .form-section-title {
             font-size: 14px;
@@ -413,17 +392,9 @@
             border-top: 1px solid #eee;
         }
 
-        .form-help {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
+        .form-help { font-size: 11px; color: var(--text-light); margin-top: 4px; }
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 24px;
-        }
+        .btn-row { display: flex; gap: 10px; margin-top: 24px; }
 
         .btn-submit {
             flex: 1;
@@ -436,11 +407,10 @@
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
+            font-family: inherit;
         }
 
-        .btn-submit:hover {
-            background: var(--primary-light);
-        }
+        .btn-submit:hover { background: var(--primary-light); }
 
         .btn-cancel {
             padding: 12px 24px;
@@ -451,19 +421,166 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            font-family: inherit;
         }
 
-        .btn-cancel:hover {
-            background: #e5e7eb;
-        }
+        .btn-cancel:hover { background: #e5e7eb; }
 
-        /* Mini map in modal */
         #modal-map {
             height: 200px;
             border-radius: 8px;
             border: 2px solid var(--border);
             margin-top: 6px;
         }
+
+        /* Image upload area */
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .image-upload-area:hover { border-color: var(--primary); background: #f8fdf9; }
+        .image-upload-area.has-image { padding: 8px; border-style: solid; }
+        .image-preview img { max-width: 100%; max-height: 200px; border-radius: 6px; }
+        .image-placeholder { color: var(--text-light); }
+        .image-placeholder div:first-child { font-size: 28px; margin-bottom: 6px; }
+
+        /* Auth modal */
+        .auth-modal { max-width: 400px; }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .auth-error { color: #dc2626; font-size: 13px; margin-bottom: 12px; min-height: 18px; }
+
+        /* Admin panel */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #f3f4f6;
+            z-index: 5000;
+            overflow-y: auto;
+        }
+
+        .admin-panel.active { display: block; }
+
+        .admin-header {
+            background: var(--primary-dark);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h2 { font-size: 20px; font-weight: 800; }
+
+        .admin-close {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .admin-close:hover { background: rgba(255,255,255,0.3); }
+
+        .admin-tabs {
+            background: white;
+            padding: 0 24px;
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-tab {
+            padding: 14px 20px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+            font-family: inherit;
+        }
+
+        .admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .admin-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-table th {
+            background: #f9fafb;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        .admin-table td {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        .admin-table tr:hover td { background: #f9fafb; }
+
+        .status-active { background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .status-inactive { background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .role-admin { background: #ede9fe; color: #5b21b6; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .role-user { background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+        .btn-admin-delete {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-admin-delete:hover { background: #b91c1c; }
 
         /* Toast */
         .toast {
@@ -477,98 +594,40 @@
             border-radius: 10px;
             font-weight: 600;
             font-size: 14px;
-            z-index: 3000;
+            z-index: 6000;
             transition: transform 0.3s;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-light);
-        }
-
-        .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .main {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-
-            .map-container {
-                height: 50vh;
-            }
-
-            .listings-panel {
-                min-height: 50vh;
-            }
-
-            .header-inner {
-                padding: 10px 14px;
-            }
-
-            .logo h1 {
-                font-size: 20px;
-            }
-
-            .filter-inner {
-                gap: 6px;
-            }
-
-            .filter-btn {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .modal {
-                padding: 20px;
-            }
+            .main { grid-template-columns: 1fr; height: auto; }
+            .map-container { height: 50vh; }
+            .listings-panel { min-height: 50vh; }
+            .header-inner { padding: 10px 14px; }
+            .logo h1 { font-size: 20px; }
+            .filter-inner { gap: 6px; }
+            .filter-btn { padding: 6px 12px; font-size: 12px; }
+            .form-row { grid-template-columns: 1fr; }
+            .modal { padding: 20px; }
+            .header-actions { gap: 6px; }
+            .btn-auth { padding: 6px 12px; font-size: 12px; }
+            .btn-add { padding: 8px 14px; font-size: 13px; }
+            .admin-table { font-size: 11px; }
+            .admin-table th, .admin-table td { padding: 8px 10px; }
         }
 
-        /* Leaflet popup custom */
-        .leaflet-popup-content-wrapper {
-            border-radius: 10px !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
-        }
-
-        .leaflet-popup-content {
-            margin: 12px 16px !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        .popup-title {
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-
-        .popup-info {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.5;
-        }
-
-        /* Custom marker */
-        .custom-marker {
-            background: var(--primary);
-            border: 3px solid white;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
+        /* Leaflet popup */
+        .leaflet-popup-content-wrapper { border-radius: 10px !important; box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important; }
+        .leaflet-popup-content { margin: 12px 16px !important; font-family: 'Inter', sans-serif !important; }
+        .popup-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+        .popup-info { font-size: 12px; color: #666; line-height: 1.5; }
+        .popup-img { width: 100%; max-height: 120px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -578,20 +637,31 @@
             <div class="logo">
                 <div class="logo-icon">&#9968;</div>
                 <div>
-                    <h1>Täide</h1>
-                    <div class="logo-subtitle">Jaga ülejäävat täitematerjali</div>
+                    <h1>Taide</h1>
+                    <div class="logo-subtitle">Jaga ulejaavat taitematerjali</div>
                 </div>
             </div>
-            <button class="btn-add" onclick="openModal()">
-                <span>+</span> Lisa kuulutus
-            </button>
+            <div class="header-actions">
+                <div id="authButtons">
+                    <button class="btn-auth" onclick="openAuthModal('login')">Logi sisse</button>
+                    <button class="btn-auth btn-auth-primary" onclick="openAuthModal('register')">Registreeru</button>
+                </div>
+                <div id="userInfo" style="display:none;">
+                    <span class="user-name" id="userName"></span>
+                    <button class="btn-admin" id="adminBtn" style="display:none;" onclick="showAdminPanel()">Admin</button>
+                    <button class="btn-auth" onclick="doLogout()">Logi valja</button>
+                </div>
+                <button class="btn-add" onclick="handleAddClick()">
+                    <span>+</span> Lisa kuulutus
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Filters -->
     <div class="filter-bar">
         <div class="filter-inner">
-            <button class="filter-btn active" data-type="koik" onclick="setFilter(this)">&#128205; Kõik</button>
+            <button class="filter-btn active" data-type="koik" onclick="setFilter(this)">&#128205; Koik</button>
             <button class="filter-btn" data-type="kivi" onclick="setFilter(this)">&#129704; Kivi</button>
             <button class="filter-btn" data-type="liiv" onclick="setFilter(this)">&#9201; Liiv</button>
             <button class="filter-btn" data-type="muld" onclick="setFilter(this)">&#127793; Muld</button>
@@ -619,14 +689,13 @@
     <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
         <div class="modal">
             <h2>&#10133; Lisa kuulutus</h2>
-            <p class="modal-subtitle">Jaga oma ülejäävat täitematerjali teistega</p>
+            <p class="modal-subtitle">Jaga oma ulejaavat taitematerjali teistega</p>
 
             <form id="listingForm" onsubmit="submitListing(event)">
-                <!-- Material info -->
                 <div class="form-group">
-                    <label>Materjali tüüp <span class="required">*</span></label>
+                    <label>Materjali tuup <span class="required">*</span></label>
                     <select name="material_type" required>
-                        <option value="">Vali materjali tüüp...</option>
+                        <option value="">Vali materjali tuup...</option>
                         <option value="kivi">Kivi</option>
                         <option value="liiv">Liiv</option>
                         <option value="muld">Muld / kasvumuld</option>
@@ -638,12 +707,12 @@
 
                 <div class="form-group">
                     <label>Pealkiri <span class="required">*</span></label>
-                    <input type="text" name="title" placeholder="nt. Ehitusliiv tasuta, tule ise järele" required>
+                    <input type="text" name="title" placeholder="nt. Ehitusliiv tasuta, tule ise jarele" required>
                 </div>
 
                 <div class="form-group">
                     <label>Kirjeldus</label>
-                    <textarea name="description" placeholder="Kirjelda materjali lähemalt - kogus, kvaliteet, tingimused..."></textarea>
+                    <textarea name="description" placeholder="Kirjelda materjali lahemalt - kogus, kvaliteet, tingimused..."></textarea>
                 </div>
 
                 <div class="form-row">
@@ -652,10 +721,10 @@
                         <input type="text" name="quantity" placeholder="nt. ~5">
                     </div>
                     <div class="form-group">
-                        <label>Ühik</label>
+                        <label>Uhik</label>
                         <select name="unit">
                             <option value="tonni">tonni</option>
-                            <option value="m3">m&sup3;</option>
+                            <option value="m3">m3</option>
                             <option value="kotti">kotti</option>
                             <option value="koormaid">koormaid</option>
                         </select>
@@ -668,6 +737,21 @@
                         <option value="tasuta">Tasuta</option>
                         <option value="kokkuleppel">Hind kokkuleppel</option>
                     </select>
+                </div>
+
+                <!-- Image upload -->
+                <div class="form-section-title">&#128247; Pilt</div>
+                <div class="form-group">
+                    <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageInput').click()">
+                        <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="previewImage(this)">
+                        <div id="imagePreview">
+                            <div class="image-placeholder">
+                                <div>&#128247;</div>
+                                <div>Kliki pildi lisamiseks</div>
+                                <div class="form-help">Max 5MB, JPG/PNG/WebP</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Contact -->
@@ -694,8 +778,8 @@
 
                 <div class="form-group">
                     <label>Aadress <span class="required">*</span></label>
-                    <input type="text" name="address" id="addressInput" placeholder="Tänav, linn" required>
-                    <div class="form-help">Kliki kaardil asukoha määramiseks või sisesta aadress</div>
+                    <input type="text" name="address" id="addressInput" placeholder="Tanav, linn" required>
+                    <div class="form-help">Kliki kaardil asukoha maaramiseks voi sisesta aadress</div>
                 </div>
 
                 <div class="form-group">
@@ -705,67 +789,242 @@
                 </div>
 
                 <div class="btn-row">
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Tühista</button>
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Tuhista</button>
                     <button type="submit" class="btn-submit">&#10004; Lisa kuulutus</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Toast notification -->
+    <!-- Auth modal -->
+    <div class="modal-overlay" id="authModalOverlay" onclick="closeAuthModalOutside(event)">
+        <div class="modal auth-modal">
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Logi sisse</button>
+                <button type="button" class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">Registreeru</button>
+            </div>
+
+            <form id="loginForm" onsubmit="doLogin(event)">
+                <div class="form-group">
+                    <label>E-post</label>
+                    <input type="email" name="email" placeholder="email@example.ee" required>
+                </div>
+                <div class="form-group">
+                    <label>Parool</label>
+                    <input type="password" name="password" placeholder="Parool" required>
+                </div>
+                <div class="auth-error" id="loginError"></div>
+                <button type="submit" class="btn-submit" style="width:100%">Logi sisse</button>
+            </form>
+
+            <form id="registerForm" style="display:none" onsubmit="doRegister(event)">
+                <div class="form-group">
+                    <label>Nimi</label>
+                    <input type="text" name="username" placeholder="Sinu nimi" required>
+                </div>
+                <div class="form-group">
+                    <label>E-post</label>
+                    <input type="email" name="email" placeholder="email@example.ee" required>
+                </div>
+                <div class="form-group">
+                    <label>Parool</label>
+                    <input type="password" name="password" placeholder="Vahemalt 6 marki" required minlength="6">
+                </div>
+                <div class="auth-error" id="registerError"></div>
+                <button type="submit" class="btn-submit" style="width:100%">Registreeru</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h2>Admin paneel</h2>
+            <button class="admin-close" onclick="hideAdminPanel()">Sulge</button>
+        </div>
+        <div class="admin-tabs">
+            <button class="admin-tab active" id="adminListingsTab" onclick="switchAdminTab('listings')">Kuulutused</button>
+            <button class="admin-tab" id="adminUsersTab" onclick="switchAdminTab('users')">Kasutajad</button>
+        </div>
+        <div class="admin-content" id="adminContent"></div>
+    </div>
+
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- State ---
+        // === STATE ===
+        let currentUser = null;
         let map, modalMap, modalMarker;
         let markers = [];
         let currentFilter = 'koik';
         let searchTimeout;
         let listings = [];
 
-        // Material labels
         const materialLabels = {
-            'kivi': 'Kivi',
-            'liiv': 'Liiv',
-            'muld': 'Muld',
-            'purustatud_betoon': 'Betoon',
-            'kruus': 'Kruus',
-            'muu': 'Muu'
+            'kivi': 'Kivi', 'liiv': 'Liiv', 'muld': 'Muld',
+            'purustatud_betoon': 'Betoon', 'kruus': 'Kruus', 'muu': 'Muu'
         };
 
         const materialEmojis = {
-            'kivi': '\u{1F9F1}',
-            'liiv': '\u23F1',
-            'muld': '\u{1F331}',
-            'purustatud_betoon': '\u{1F9F1}',
-            'kruus': '\u2B1C',
-            'muu': '\u{1F4E6}'
+            'kivi': '\u{1F9F1}', 'liiv': '\u23F1', 'muld': '\u{1F331}',
+            'purustatud_betoon': '\u{1F9F1}', 'kruus': '\u2B1C', 'muu': '\u{1F4E6}'
         };
 
-        // Marker colors per type
         const markerColors = {
-            'kivi': '#64748b',
-            'liiv': '#d97706',
-            'muld': '#059669',
-            'purustatud_betoon': '#6b7280',
-            'kruus': '#db2777',
-            'muu': '#7c3aed'
+            'kivi': '#64748b', 'liiv': '#d97706', 'muld': '#059669',
+            'purustatud_betoon': '#6b7280', 'kruus': '#db2777', 'muu': '#7c3aed'
         };
 
-        // --- Initialize map ---
+        // === AUTH ===
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                const data = await res.json();
+                currentUser = data.user;
+                updateAuthUI();
+            } catch (e) {
+                currentUser = null;
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            const authBtns = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+            const adminBtn = document.getElementById('adminBtn');
+
+            if (currentUser) {
+                authBtns.style.display = 'none';
+                userInfo.style.display = 'flex';
+                userInfo.style.alignItems = 'center';
+                userInfo.style.gap = '10px';
+                document.getElementById('userName').textContent = currentUser.username;
+                adminBtn.style.display = currentUser.role === 'admin' ? 'inline-block' : 'none';
+            } else {
+                authBtns.style.display = 'flex';
+                authBtns.style.gap = '8px';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        function handleAddClick() {
+            if (!currentUser) {
+                showToast('Palun logi sisse kuulutuse lisamiseks');
+                openAuthModal('login');
+                return;
+            }
+            openModal();
+        }
+
+        function openAuthModal(tab) {
+            document.getElementById('authModalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            switchAuthTab(tab || 'login');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('registerError').textContent = '';
+        }
+
+        function closeAuthModalOutside(e) {
+            if (e.target === document.getElementById('authModalOverlay')) closeAuthModal();
+        }
+
+        function switchAuthTab(tab) {
+            document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+            document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+        }
+
+        async function doLogin(e) {
+            e.preventDefault();
+            const form = e.target;
+            const errEl = document.getElementById('loginError');
+            errEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: form.email.value,
+                        password: form.password.value
+                    })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    currentUser = data.user;
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast('Sisse logitud!');
+                    loadListings();
+                } else {
+                    errEl.textContent = data.error || 'Viga sisselogimisel';
+                }
+            } catch (err) {
+                errEl.textContent = 'Vorgu viga';
+            }
+        }
+
+        async function doRegister(e) {
+            e.preventDefault();
+            const form = e.target;
+            const errEl = document.getElementById('registerError');
+            errEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: form.username.value,
+                        email: form.email.value,
+                        password: form.password.value
+                    })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    currentUser = data.user;
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast('Registreerimine onnestus!');
+                    loadListings();
+                } else {
+                    errEl.textContent = data.error || 'Viga registreerimisel';
+                }
+            } catch (err) {
+                errEl.textContent = 'Vorgu viga';
+            }
+        }
+
+        async function doLogout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            currentUser = null;
+            updateAuthUI();
+            showToast('Valja logitud!');
+            loadListings();
+        }
+
+        // === MAP ===
         function initMap() {
             map = L.map('map').setView([58.8, 25.5], 7);
-
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap',
                 maxZoom: 18
             }).addTo(map);
-
             loadListings();
         }
 
-        // --- Create colored marker ---
         function createMarkerIcon(type) {
             const color = markerColors[type] || '#2d6a4f';
             return L.divIcon({
@@ -778,14 +1037,14 @@
                     box-shadow: 0 2px 6px rgba(0,0,0,0.35);
                     display: flex; align-items: center; justify-content: center;
                     font-size: 13px;
-                ">${materialEmojis[type] || '📍'}</div>`,
+                ">${materialEmojis[type] || ''}</div>`,
                 iconSize: [28, 28],
                 iconAnchor: [14, 14],
                 popupAnchor: [0, -16]
             });
         }
 
-        // --- Load listings from API ---
+        // === LISTINGS ===
         async function loadListings() {
             try {
                 const params = new URLSearchParams();
@@ -795,7 +1054,6 @@
 
                 const res = await fetch('/api/listings?' + params.toString());
                 listings = await res.json();
-
                 renderListings();
                 renderMarkers();
             } catch (err) {
@@ -803,7 +1061,12 @@
             }
         }
 
-        // --- Render listing cards ---
+        function canDelete(l) {
+            if (!currentUser) return false;
+            if (currentUser.role === 'admin') return true;
+            return l.user_id === currentUser.id;
+        }
+
         function renderListings() {
             const container = document.getElementById('listingsList');
             const countEl = document.getElementById('listingsCount');
@@ -815,13 +1078,14 @@
                     <div class="empty-state">
                         <div class="icon">&#128270;</div>
                         <p>Kuulutusi ei leitud</p>
-                        <p style="font-size:12px; margin-top:8px;">Proovi teist filtrit või lisa uus kuulutus</p>
+                        <p style="font-size:12px; margin-top:8px;">Proovi teist filtrit voi lisa uus kuulutus</p>
                     </div>`;
                 return;
             }
 
             container.innerHTML = listings.map(l => `
                 <div class="listing-card" id="card-${l.id}" onclick="toggleCard(${l.id})">
+                    ${l.image_url ? `<div class="listing-image"><img src="${escapeHtml(l.image_url)}" alt=""></div>` : ''}
                     <div class="listing-header">
                         <div class="listing-title">${escapeHtml(l.title)}</div>
                         <span class="material-badge badge-${l.material_type}">${materialLabels[l.material_type] || l.material_type}</span>
@@ -839,12 +1103,12 @@
                         ${l.contact_phone ? `<p>&#128222; <a href="tel:${l.contact_phone}">${escapeHtml(l.contact_phone)}</a></p>` : ''}
                         ${l.contact_email ? `<p>&#9993; <a href="mailto:${l.contact_email}">${escapeHtml(l.contact_email)}</a></p>` : ''}
                         <p style="font-size:11px;color:#999;margin-top:6px;">Lisatud: ${new Date(l.created_at).toLocaleDateString('et-EE')}</p>
+                        ${canDelete(l) ? `<button class="btn-delete" onclick="event.stopPropagation(); deleteListing(${l.id})">Kustuta kuulutus</button>` : ''}
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- Render markers on map ---
         function renderMarkers() {
             markers.forEach(m => map.removeLayer(m));
             markers = [];
@@ -857,6 +1121,7 @@
                 }).addTo(map);
 
                 marker.bindPopup(`
+                    ${l.image_url ? `<img class="popup-img" src="${escapeHtml(l.image_url)}" alt="">` : ''}
                     <div class="popup-title">${escapeHtml(l.title)}</div>
                     <div class="popup-info">
                         <strong>${materialLabels[l.material_type] || l.material_type}</strong><br>
@@ -870,41 +1135,47 @@
                     </div>
                 `);
 
-                marker.on('click', () => {
-                    highlightCard(l.id);
-                });
-
+                marker.on('click', () => highlightCard(l.id));
                 marker.listingId = l.id;
                 markers.push(marker);
             });
 
-            // Fit bounds if listings exist
             if (markers.length > 0) {
                 const group = L.featureGroup(markers);
                 map.fitBounds(group.getBounds().pad(0.1));
             }
         }
 
-        // --- Card interactions ---
+        async function deleteListing(id) {
+            if (!confirm('Kas oled kindel, et soovid selle kuulutuse kustutada?')) return;
+
+            try {
+                const res = await fetch(`/api/listings/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showToast('Kuulutus kustutatud!');
+                    loadListings();
+                } else {
+                    const data = await res.json();
+                    showToast('Viga: ' + (data.error || 'Midagi laks valesti'));
+                }
+            } catch (err) {
+                showToast('Vorgu viga');
+            }
+        }
+
+        // === CARD INTERACTIONS ===
         function toggleCard(id) {
             const card = document.getElementById(`card-${id}`);
             const wasExpanded = card.classList.contains('expanded');
 
-            // Close all
             document.querySelectorAll('.listing-card.expanded').forEach(c => c.classList.remove('expanded'));
 
-            if (!wasExpanded) {
-                card.classList.add('expanded');
-            }
+            if (!wasExpanded) card.classList.add('expanded');
 
-            // Pan map to listing
             const listing = listings.find(l => l.id === id);
             if (listing && listing.latitude && listing.longitude) {
                 map.setView([listing.latitude, listing.longitude], 14, { animate: true });
-                // Open popup
-                markers.forEach(m => {
-                    if (m.listingId === id) m.openPopup();
-                });
+                markers.forEach(m => { if (m.listingId === id) m.openPopup(); });
             }
         }
 
@@ -918,7 +1189,7 @@
             }
         }
 
-        // --- Filters ---
+        // === FILTERS ===
         function setFilter(btn) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -931,18 +1202,23 @@
             searchTimeout = setTimeout(loadListings, 300);
         }
 
-        // --- Modal ---
+        // === LISTING MODAL ===
         function openModal() {
             document.getElementById('modalOverlay').classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            // Initialize modal map
+            // Pre-fill contact info from user
+            if (currentUser) {
+                const form = document.getElementById('listingForm');
+                form.contact_name.value = currentUser.username || '';
+                form.contact_email.value = currentUser.email || '';
+            }
+
             setTimeout(() => {
                 if (!modalMap) {
                     modalMap = L.map('modal-map').setView([59.437, 24.7536], 11);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OSM',
-                        maxZoom: 18
+                        attribution: '&copy; OSM', maxZoom: 18
                     }).addTo(modalMap);
 
                     modalMap.on('click', function(e) {
@@ -972,15 +1248,31 @@
             }
             document.getElementById('latInput').value = '';
             document.getElementById('lngInput').value = '';
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').innerHTML = '<div class="image-placeholder"><div>&#128247;</div><div>Kliki pildi lisamiseks</div><div class="form-help">Max 5MB, JPG/PNG/WebP</div></div>';
+            document.getElementById('imageUploadArea').classList.remove('has-image');
         }
 
         function closeModalOutside(e) {
-            if (e.target === document.getElementById('modalOverlay')) {
-                closeModal();
+            if (e.target === document.getElementById('modalOverlay')) closeModal();
+        }
+
+        function previewImage(input) {
+            const file = input.files[0];
+            const area = document.getElementById('imageUploadArea');
+            const preview = document.getElementById('imagePreview');
+
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Pilt on liiga suur (max 5MB)');
+                    input.value = '';
+                    return;
+                }
+                preview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Eelvaade">`;
+                area.classList.add('has-image');
             }
         }
 
-        // --- Submit listing ---
         async function submitListing(e) {
             e.preventDefault();
 
@@ -989,8 +1281,34 @@
             const lng = document.getElementById('lngInput').value;
 
             if (!lat || !lng) {
-                showToast('&#9888; Palun kliki kaardil asukoha määramiseks!');
+                showToast('Palun kliki kaardil asukoha maaramiseks!');
                 return;
+            }
+
+            // Upload image first if selected
+            let image_url = '';
+            const imageInput = document.getElementById('imageInput');
+            if (imageInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', imageInput.files[0]);
+
+                try {
+                    const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+                    if (uploadRes.status === 413) {
+                        showToast('Pilt on liiga suur (max 5MB)');
+                        return;
+                    }
+                    const uploadData = await uploadRes.json();
+                    if (uploadData.success) {
+                        image_url = uploadData.image_url;
+                    } else {
+                        showToast('Pildi uleslaadimine ebaonnestus: ' + (uploadData.error || ''));
+                        return;
+                    }
+                } catch (err) {
+                    showToast('Pildi uleslaadimine ebaonnestus');
+                    return;
+                }
             }
 
             const data = {
@@ -1005,7 +1323,8 @@
                 contact_email: form.contact_email.value,
                 address: form.address.value,
                 latitude: parseFloat(lat),
-                longitude: parseFloat(lng)
+                longitude: parseFloat(lng),
+                image_url: image_url
             };
 
             try {
@@ -1017,18 +1336,124 @@
 
                 if (res.ok) {
                     closeModal();
-                    showToast('&#10004; Kuulutus edukalt lisatud!');
+                    showToast('Kuulutus edukalt lisatud!');
                     loadListings();
                 } else {
                     const err = await res.json();
-                    showToast('&#9888; Viga: ' + (err.error || 'Midagi läks valesti'));
+                    showToast('Viga: ' + (err.error || 'Midagi laks valesti'));
                 }
             } catch (err) {
-                showToast('&#9888; Võrgu viga, proovi uuesti');
+                showToast('Vorgu viga, proovi uuesti');
             }
         }
 
-        // --- Toast ---
+        // === ADMIN ===
+        async function showAdminPanel() {
+            document.getElementById('adminPanel').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            switchAdminTab('listings');
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('adminPanel').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('adminListingsTab').classList.toggle('active', tab === 'listings');
+            document.getElementById('adminUsersTab').classList.toggle('active', tab === 'users');
+            if (tab === 'listings') loadAdminListings();
+            else loadAdminUsers();
+        }
+
+        async function loadAdminListings() {
+            const content = document.getElementById('adminContent');
+            try {
+                const res = await fetch('/api/admin/listings');
+                const data = await res.json();
+                content.innerHTML = `
+                    <p style="margin-bottom:16px;color:var(--text-light);">Kokku ${data.length} kuulutust</p>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pealkiri</th>
+                                <th>Tuup</th>
+                                <th>Asukoht</th>
+                                <th>Staatus</th>
+                                <th>Kasutaja</th>
+                                <th>Kuupaev</th>
+                                <th>Tegevus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(l => `
+                                <tr>
+                                    <td>${l.id}</td>
+                                    <td><strong>${escapeHtml(l.title)}</strong></td>
+                                    <td>${materialLabels[l.material_type] || l.material_type}</td>
+                                    <td>${escapeHtml(l.address || '')}</td>
+                                    <td><span class="${l.is_active ? 'status-active' : 'status-inactive'}">${l.is_active ? 'Aktiivne' : 'Kustutatud'}</span></td>
+                                    <td>${l.user_id || '-'}</td>
+                                    <td>${new Date(l.created_at).toLocaleDateString('et-EE')}</td>
+                                    <td><button class="btn-admin-delete" onclick="adminDeleteListing(${l.id})">Kustuta</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>`;
+            } catch (err) {
+                content.innerHTML = '<p>Viga andmete laadimisel</p>';
+            }
+        }
+
+        async function loadAdminUsers() {
+            const content = document.getElementById('adminContent');
+            try {
+                const res = await fetch('/api/admin/users');
+                const data = await res.json();
+                content.innerHTML = `
+                    <p style="margin-bottom:16px;color:var(--text-light);">Kokku ${data.length} kasutajat</p>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nimi</th>
+                                <th>E-post</th>
+                                <th>Roll</th>
+                                <th>Liitunud</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(u => `
+                                <tr>
+                                    <td>${u.id}</td>
+                                    <td><strong>${escapeHtml(u.username)}</strong></td>
+                                    <td>${escapeHtml(u.email)}</td>
+                                    <td><span class="${u.role === 'admin' ? 'role-admin' : 'role-user'}">${u.role}</span></td>
+                                    <td>${new Date(u.created_at).toLocaleDateString('et-EE')}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>`;
+            } catch (err) {
+                content.innerHTML = '<p>Viga andmete laadimisel</p>';
+            }
+        }
+
+        async function adminDeleteListing(id) {
+            if (!confirm('Kas oled kindel? See kustutab kuulutuse LOPPLIKULT!')) return;
+            try {
+                const res = await fetch(`/api/admin/listings/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showToast('Kuulutus lopplikult kustutatud!');
+                    loadAdminListings();
+                }
+            } catch (err) {
+                showToast('Viga kustutamisel');
+            }
+        }
+
+        // === UTILS ===
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerHTML = msg;
@@ -1036,14 +1461,16 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // --- Helpers ---
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // --- Init ---
-        document.addEventListener('DOMContentLoaded', initMap);
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            initMap();
+        });
     </script>
 </body>
 </html>
