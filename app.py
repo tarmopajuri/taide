@@ -4,8 +4,11 @@ fillio.eu
 """
 import os
 import uuid
+import json
 import secrets
 import smtplib
+import urllib.request
+import urllib.error
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, request, jsonify, render_template, g, session, send_from_directory
@@ -28,6 +31,9 @@ SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
 SMTP_USER = os.environ.get('SMTP_USER', '')
 SMTP_PASS = os.environ.get('SMTP_PASS', '')
 SMTP_FROM = os.environ.get('SMTP_FROM', 'noreply@fillio.eu')
+
+# --- Google OAuth config ---
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 
 # --- Database config ---
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
@@ -271,7 +277,7 @@ def init_db():
 # --- Routes ---
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', google_client_id=GOOGLE_CLIENT_ID)
 
 # --- Static docs ---
 @app.route('/docs/<path:filename>')
@@ -444,6 +450,75 @@ def reset_password():
     db_commit()
 
     return jsonify({'success': True, 'message': 'Parool on edukalt muudetud!'})
+
+# --- Google OAuth ---
+@app.route('/api/auth/google', methods=['POST'])
+def google_auth():
+    data = request.get_json()
+    credential = data.get('credential', '')
+
+    if not credential:
+        return jsonify({'error': 'Google credential puudub'}), 400
+
+    if not GOOGLE_CLIENT_ID:
+        return jsonify({'error': 'Google login pole seadistatud'}), 500
+
+    # Verify token with Google
+    try:
+        verify_url = f'https://oauth2.googleapis.com/tokeninfo?id_token={credential}'
+        req = urllib.request.Request(verify_url)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            token_info = json.loads(resp.read().decode())
+    except Exception as e:
+        print(f"[GOOGLE AUTH] Token verification failed: {e}")
+        return jsonify({'error': 'Google tokeni verifitseerimine ebaonnestus'}), 401
+
+    # Check audience matches our client ID
+    if token_info.get('aud') != GOOGLE_CLIENT_ID:
+        return jsonify({'error': 'Vale Google client ID'}), 401
+
+    email = token_info.get('email', '').lower()
+    name = token_info.get('name', '') or token_info.get('given_name', '') or email.split('@')[0]
+
+    if not email:
+        return jsonify({'error': 'E-posti aadress puudub Google kontost'}), 400
+
+    # Check if user exists
+    cur = db_execute("SELECT id, email, username, role FROM users WHERE email = ?", (email,))
+    user = db_fetchone(cur)
+
+    if user:
+        # Login existing user
+        session['user_id'] = user['id']
+        return jsonify({'success': True, 'user': user, 'is_new': False})
+    else:
+        # Register new user with random password (they use Google to login)
+        random_pass = secrets.token_urlsafe(32)
+        db_execute("INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)",
+                   (email, name, generate_password_hash(random_pass)))
+        db_commit()
+
+        cur = db_execute("SELECT id, email, username, role FROM users WHERE email = ?", (email,))
+        user = db_fetchone(cur)
+        session['user_id'] = user['id']
+
+        # Send welcome email
+        send_email(email, 'Tere tulemast Fillio platvormile!', f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: #1b4332; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+                <h1 style="margin: 0; font-size: 28px;">Fillio</h1>
+            </div>
+            <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+                <h2 style="color: #1b4332;">Tere, {name}!</h2>
+                <p>Sinu konto on loodud Google kontoga. Tere tulemast!</p>
+                <p style="margin-top: 20px;">
+                    <a href="https://fillio.eu" style="background: #2d6a4f; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ava Fillio</a>
+                </p>
+            </div>
+        </div>
+        """)
+
+        return jsonify({'success': True, 'user': user, 'is_new': True}), 201
 
 # --- User's own listings ---
 @app.route('/api/my-listings', methods=['GET'])
