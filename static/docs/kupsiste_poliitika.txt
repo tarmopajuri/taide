@@ -1,0 +1,47 @@
+FILLIO KUPSISTE POLIITIKA
+Kehtib alates: 06.03.2026
+
+1. MIS ON KUPSISED?
+
+Kupsised (cookies) on vaikesed tekstifailid, mida veebileht salvestab teie seadmesse. Need aitavad veebilehel meelde jatta teie eelistusi ja tagada parema kasutajakogemuse.
+
+2. MILLISEID KUPSISEID ME KASUTAME
+
+2.1. Hädavajalikud kupsised (session cookies)
+- Eesmärk: Sisselogimise sessiooni haldamine
+- Kestvus: Kuni brauseri sulgemiseni voi sessiooni aegumiseni
+- Tüüp: Esimese osapoole kupsis
+- Kohustuslik: Jah, platvormi toimimiseks vajalik
+
+2.2. Kolmandate osapoolte kupsised
+
+a) OpenStreetMap / Leaflet kaarditeenus:
+- Eesmärk: Interaktiivse kaardi kuvamine
+- Pakkuja: OpenStreetMap Foundation
+- Lisainfo: https://wiki.openstreetmap.org/wiki/Privacy_Policy
+
+b) Google Fonts:
+- Eesmärk: Veebifontide laadimine
+- Pakkuja: Google LLC
+- Lisainfo: https://policies.google.com/privacy
+
+3. KUPSISTE HALDAMINE
+
+Saate kupsiseid hallata oma brauseri seadetes:
+- Chrome: Seaded > Privaatsus ja turvalisus > Kupsised
+- Firefox: Seaded > Privaatsus ja turvalisus
+- Safari: Eelistused > Privaatsus
+- Edge: Seaded > Kupsised ja saidi load
+
+NB! Kohustuslike kupsiste blokeerimine voib takistada platvormi normaalset toimimist (nt sisselogimine ei toimi).
+
+4. ANALUUTIKA
+
+Hetkel me ei kasuta eraldi analuutika teenuseid (nt Google Analytics). Kui see tulevikus muutub, uuendame seda poliitikat vastavalt.
+
+5. KONTAKT
+
+Kupsistega seotud kusimuste korral:
+E-post: tarmo@tardek.com
+
+Viimati uuendatud: 06.03.2026

@@ -1,22 +1,33 @@
 """
-Taide - Ulejaava taitematerjali jagamise platvorm
-taide.ee
+Fillio - Ulejaava ehitusmaterjali jagamise platvorm
+fillio.eu
 """
 import os
 import uuid
-from flask import Flask, request, jsonify, render_template, g, session
+import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from flask import Flask, request, jsonify, render_template, g, session, send_from_directory
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app)
-app.secret_key = os.environ.get('SECRET_KEY', 'taide-dev-secret-key-change-me')
+app.secret_key = os.environ.get('SECRET_KEY', 'fillio-dev-secret-key-change-me')
 
 # --- Upload config ---
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# --- Email config ---
+SMTP_SERVER = os.environ.get('SMTP_SERVER', '')
+SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+SMTP_USER = os.environ.get('SMTP_USER', '')
+SMTP_PASS = os.environ.get('SMTP_PASS', '')
+SMTP_FROM = os.environ.get('SMTP_FROM', 'noreply@fillio.eu')
 
 # --- Database config ---
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
@@ -91,6 +102,28 @@ def get_current_user():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def send_email(to_email, subject, html_body):
+    """Send email via SMTP. Silent fail if not configured."""
+    if not SMTP_SERVER or not SMTP_USER:
+        print(f"[EMAIL] SMTP not configured. Would send to {to_email}: {subject}")
+        return False
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = SMTP_FROM
+        msg['To'] = to_email
+        msg.attach(MIMEText(html_body, 'html'))
+
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASS)
+            server.sendmail(SMTP_FROM, to_email, msg.as_string())
+        print(f"[EMAIL] Sent to {to_email}: {subject}")
+        return True
+    except Exception as e:
+        print(f"[EMAIL] Failed to send to {to_email}: {e}")
+        return False
+
 # --- Initialize database ---
 def init_db():
     if is_postgres():
@@ -107,6 +140,8 @@ def init_db():
                 username TEXT NOT NULL,
                 password_hash TEXT NOT NULL,
                 role TEXT DEFAULT 'user',
+                reset_token TEXT,
+                reset_token_expires TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -133,6 +168,12 @@ def init_db():
             )
         """)
         cur.execute("ALTER TABLE listings ADD COLUMN IF NOT EXISTS user_id INTEGER")
+        # Add reset token columns if missing
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT")
+            cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP")
+        except Exception:
+            pass
         db.commit()
         cur.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
         admin_count = cur.fetchone()[0]
@@ -150,6 +191,8 @@ def init_db():
                 username TEXT NOT NULL,
                 password_hash TEXT NOT NULL,
                 role TEXT DEFAULT 'user',
+                reset_token TEXT,
+                reset_token_expires TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -179,6 +222,14 @@ def init_db():
             cur.execute("ALTER TABLE listings ADD COLUMN user_id INTEGER")
         except Exception:
             pass
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN reset_token TEXT")
+        except Exception:
+            pass
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN reset_token_expires TIMESTAMP")
+        except Exception:
+            pass
         db.commit()
         cur.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
         admin_count = cur.fetchone()[0]
@@ -190,7 +241,7 @@ def init_db():
         ph = '%s' if is_postgres() else '?'
         cur.execute(
             f"INSERT INTO users (email, username, password_hash, role) VALUES ({ph}, {ph}, {ph}, {ph})",
-            ('admin@taide.ee', 'Admin', generate_password_hash('admin123'), 'admin')
+            ('admin@fillio.eu', 'Admin', generate_password_hash('admin123'), 'admin')
         )
         db.commit()
 
@@ -222,6 +273,12 @@ def init_db():
 def index():
     return render_template('index.html')
 
+# --- Static docs ---
+@app.route('/docs/<path:filename>')
+def serve_doc(filename):
+    docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'docs')
+    return send_from_directory(docs_dir, filename)
+
 # --- Auth routes ---
 @app.route('/api/auth/register', methods=['POST'])
 def register():
@@ -246,6 +303,34 @@ def register():
     cur = db_execute("SELECT id, email, username, role FROM users WHERE email = ?", (email,))
     user = db_fetchone(cur)
     session['user_id'] = user['id']
+
+    # Send welcome email
+    send_email(email, 'Tere tulemast Fillio platvormile!', f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #1b4332; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px;">Fillio</h1>
+            <p style="margin: 5px 0 0; opacity: 0.8;">Ehitusmaterjali jagamise platvorm</p>
+        </div>
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+            <h2 style="color: #1b4332;">Tere, {username}!</h2>
+            <p>Sinu konto on edukalt loodud. Nüüd saad:</p>
+            <ul>
+                <li>Lisada kuulutusi ülejäänud ehitusmaterjalide kohta</li>
+                <li>Hallata oma kuulutusi</li>
+                <li>Leida tasuta ehitusmaterjale</li>
+            </ul>
+            <p style="margin-top: 20px;">
+                <a href="https://fillio.eu" style="background: #2d6a4f; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                    Ava Fillio
+                </a>
+            </p>
+            <p style="color: #999; font-size: 12px; margin-top: 30px;">
+                See kiri saadeti automaatselt fillio.eu poolt. Kui sa ei loonud kontot, ignoreeri seda kirja.
+            </p>
+        </div>
+    </div>
+    """)
+
     return jsonify({'success': True, 'user': user}), 201
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -281,6 +366,95 @@ def me():
         return jsonify({'user': user})
     return jsonify({'user': None})
 
+# --- Password reset ---
+@app.route('/api/auth/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json()
+    email = (data.get('email') or '').strip().lower()
+
+    if not email:
+        return jsonify({'error': 'E-posti aadress on kohustuslik'}), 400
+
+    cur = db_execute("SELECT id, username FROM users WHERE email = ?", (email,))
+    user = db_fetchone(cur)
+
+    # Always return success to prevent email enumeration
+    if not user:
+        return jsonify({'success': True, 'message': 'Kui see e-post on registreeritud, saadame parooli taastamise lingi.'})
+
+    # Generate reset token
+    token = secrets.token_urlsafe(32)
+
+    if is_postgres():
+        db_execute("UPDATE users SET reset_token = ?, reset_token_expires = NOW() + INTERVAL '1 hour' WHERE email = ?", (token, email))
+    else:
+        db_execute("UPDATE users SET reset_token = ?, reset_token_expires = datetime('now', '+1 hour') WHERE email = ?", (token, email))
+    db_commit()
+
+    # Send reset email
+    reset_url = f"https://fillio.eu?reset_token={token}"
+    send_email(email, 'Fillio - parooli taastamine', f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #1b4332; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px;">Fillio</h1>
+        </div>
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+            <h2 style="color: #1b4332;">Parooli taastamine</h2>
+            <p>Tere, {user['username']}!</p>
+            <p>Keegi (loodetavasti sina) soovis taastada sinu Fillio konto parooli.</p>
+            <p style="margin-top: 20px;">
+                <a href="{reset_url}" style="background: #2d6a4f; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                    Taasta parool
+                </a>
+            </p>
+            <p style="color: #666; margin-top: 20px;">See link kehtib 1 tunni.</p>
+            <p style="color: #999; font-size: 12px; margin-top: 30px;">
+                Kui sa ei soovinud parooli taastada, ignoreeri seda kirja.
+            </p>
+        </div>
+    </div>
+    """)
+
+    return jsonify({'success': True, 'message': 'Kui see e-post on registreeritud, saadame parooli taastamise lingi.'})
+
+@app.route('/api/auth/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    token = (data.get('token') or '').strip()
+    new_password = data.get('password') or ''
+
+    if not token or not new_password:
+        return jsonify({'error': 'Token ja uus parool on kohustuslikud'}), 400
+
+    if len(new_password) < 6:
+        return jsonify({'error': 'Parool peab olema vahemalt 6 marki'}), 400
+
+    if is_postgres():
+        cur = db_execute("SELECT id, email FROM users WHERE reset_token = ? AND reset_token_expires > NOW()", (token,))
+    else:
+        cur = db_execute("SELECT id, email FROM users WHERE reset_token = ? AND reset_token_expires > datetime('now')", (token,))
+
+    user = db_fetchone(cur)
+
+    if not user:
+        return jsonify({'error': 'Link on aegunud voi vigane. Proovi uuesti.'}), 400
+
+    db_execute("UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?",
+               (generate_password_hash(new_password), user['id']))
+    db_commit()
+
+    return jsonify({'success': True, 'message': 'Parool on edukalt muudetud!'})
+
+# --- User's own listings ---
+@app.route('/api/my-listings', methods=['GET'])
+def my_listings():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Pead olema sisse logitud'}), 401
+
+    cur = db_execute("SELECT * FROM listings WHERE user_id = ? ORDER BY created_at DESC", (user['id'],))
+    return jsonify(db_fetchall(cur))
+
 # --- Listings routes ---
 @app.route('/api/listings', methods=['GET'])
 def get_listings():
@@ -312,7 +486,7 @@ def get_listings():
 def create_listing():
     user = get_current_user()
     if not user:
-        return jsonify({'error': 'Pead olema sisse logitud'}), 401
+        return jsonify({'error': 'Kuulutuse lisamiseks pead olema sisse logitud'}), 401
 
     data = request.get_json()
     required = ['material_type', 'title', 'contact_name', 'address', 'latitude', 'longitude']
@@ -417,8 +591,8 @@ with app.app_context():
 
 if __name__ == '__main__':
     print("")
-    print("=== Taide server tootab! ===")
+    print("=== Fillio server tootab! ===")
     print("Ava brauseris: http://localhost:5000")
-    print("Admin: admin@taide.ee / admin123")
+    print("Admin: admin@fillio.eu / admin123")
     print("")
     app.run(debug=True, host='0.0.0.0', port=5000)

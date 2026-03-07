@@ -1,0 +1,83 @@
+FILLIO PLATVORMI REEGLID
+Kehtib alates: 06.03.2026
+
+1. ULDREEGLID
+
+1.1. Fillio on platvorm, mis voimalddab kasutajatel jagada ulejaavaid ehitusmaterjale.
+1.2. Platvormi kasutamine eeldab nende reeglitega noustumist.
+1.3. Fillio jatab endale oiguse reegleid muuta, teavitades sellest kasutajaid.
+
+2. KASUTAJAKONTO
+
+2.1. Konto loomiseks tuleb esitada kehtiv e-posti aadress ja nimi.
+2.2. Iga kasutaja voib omada ainult uht kontot.
+2.3. Kasutaja vastutab oma konto turvalisuse eest (parooli hoidmine).
+2.4. Konto andmed peavad olema topsed ja ajakohased.
+2.5. Konto vaaarkasutamise korral teavitage kohe: tarmo@tardek.com
+
+3. KUULUTUSTE LISAMINE
+
+3.1. Kuulutuse lisamiseks peab olema sisse logitud.
+3.2. Kuulutus peab sisaldama:
+    - Materjali tuupi
+    - Pealkirja (korrektne ja kirjeldav)
+    - Kontaktandmeid (vahemalt nimi)
+    - Asukohta (korrektne aadress ja kaardimarker)
+
+3.3. Kuulutus peab olema:
+    - Topsele ja tegelikkusele vastav
+    - Eesti keeles (voi arusaadav)
+    - Seotud ehitusmaterjalidega
+
+3.4. Lubatud materjalid:
+    - Kivi, liiv, muld, kruus, betoon
+    - Muud ehitus- ja taitematerjalid
+    - Kasutatud ehitusmaterjalid heas seisukorras
+
+4. KEELATUD SISU
+
+4.1. Keelatud on postitada:
+    - Ohtlikke voi keskkonnaohtlikke materjale (asbest, ohtlikud jatmed)
+    - Varastatud materjale
+    - Materjale, mille muuk on seadusega keelatud
+    - Solvavat, diskrimineerivat voi ebaseaduslikku sisu
+    - Rampspostit (spam) voi korduvaid kuulutusi
+    - Materjale, mis ei ole seotud ehitusega
+    - Ettevotete tavareklaami
+
+5. KONTAKTANDMED KUULUTUSTES
+
+5.1. Kontaktandmed peavad olema topsed.
+5.2. Kontaktandmed on niihtavad koigile kasutajatele.
+5.3. Kasutaja vastutab ise oma kontaktandmete avaldamise eest.
+
+6. KUULUTUSTE HALDAMINE
+
+6.1. Kasutaja saab oma kuulutusi kustutada.
+6.2. Aegunud kuulutused tuleks kohe kustutada.
+6.3. Fillio administraatoril on oigus kustutada kuulutusi, mis rikuvad reegleid.
+
+7. VASTUTUS
+
+7.1. Fillio on vahendusplatvorm ja ei vastuta:
+    - Materjalide kvaliteedi eest
+    - Kasutajatevaheliste kokkulepete eest
+    - Kahju eest, mis tekib materjalide kasutamisest
+7.2. Kasutajad suhtlevad ja lepivad kokku omavahel.
+7.3. Fillio ei osale tehingutes ega vahenda makseid.
+
+8. REEGLITE RIKKUMINE
+
+8.1. Reeglite rikkumise korral voib Fillio:
+    - Kustutada reeglitevastased kuulutused
+    - Hoiatada kasutajat
+    - Piirata voi sulgeda kasutajakonto
+8.2. Korduva rikkumise korral voib konto jaaadavalt sulgeda.
+
+9. KONTAKT
+
+Kusimuste ja ettepanekute korral:
+E-post: tarmo@tardek.com
+Veebileht: https://fillio.eu
+
+Viimati uuendatud: 06.03.2026

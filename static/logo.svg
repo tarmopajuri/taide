@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Recycling circle -->
+  <circle cx="50" cy="45" r="38" fill="none" stroke="#40916c" stroke-width="6" stroke-dasharray="160 80" stroke-linecap="round"/>
+  <!-- Arrow tips -->
+  <polygon points="78,25 88,30 80,35" fill="#40916c"/>
+  <polygon points="22,62 12,58 20,52" fill="#8B6914"/>
+  <!-- Stones -->
+  <ellipse cx="40" cy="42" rx="12" ry="9" fill="#9CA3AF"/>
+  <ellipse cx="35" cy="36" rx="8" ry="6" fill="#B0B8C4"/>
+  <ellipse cx="46" cy="38" rx="7" ry="5" fill="#A0A8B4"/>
+  <!-- Wood -->
+  <rect x="50" y="35" width="18" height="5" rx="1" fill="#C08840" transform="rotate(-15 59 37)"/>
+  <rect x="52" y="42" width="16" height="4" rx="1" fill="#D4A050" transform="rotate(-10 60 44)"/>
+  <rect x="48" y="48" width="17" height="4" rx="1" fill="#B07830" transform="rotate(-5 56 50)"/>
+  <!-- Leaf -->
+  <path d="M20,50 Q25,35 35,45 Q28,50 20,50Z" fill="#2d6a4f"/>
+</svg>

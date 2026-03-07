@@ -1,0 +1,75 @@
+FILLIO PRIVAATSUSPOLIITIKA
+Kehtib alates: 06.03.2026
+
+1. ULDINFO
+
+Fillio (fillio.eu) on ehitusmaterjali jagamise platvorm, mida haldab Tardek.
+Vastutav tootleja: Tardek
+Kontakt: tarmo@tardek.com
+Veebileht: https://fillio.eu
+
+Kaesolev privaatsuspoliitika kirjeldab, kuidas me kogume, kasutame ja kaitseme teie isikuandmeid kooskolasEuroopa Liidu isikuandmete kaitse uldmaarusega (GDPR).
+
+2. MILLISEID ANDMEID ME KOGUME
+
+2.1. Konto loomisel:
+- Nimi (kasutajanimi)
+- E-posti aadress
+- Parool (salvestatud kruupteeritud kujul)
+
+2.2. Kuulutuse lisamisel:
+- Kontaktisiku nimi
+- Telefoninumber (valikuline)
+- E-posti aadress (valikuline)
+- Aadress / asukoht (koordinaadid)
+- Uleslaaditud pildid
+
+2.3. Automaatselt kogutavad andmed:
+- Sessiooniküpsised (sisselogimise jaoks)
+- IP-aadress (serveri logid)
+
+3. ANDMETE KASUTAMISE EESMARGID
+
+Teie andmeid kasutatakse jargmistel eesmärkidel:
+- Kasutajakonto haldamine ja autentimine
+- Kuulutuste avaldamine ja haldamine
+- Teiste kasutajatega suhtlemise voimal damine
+- Platvormi toimimise tagamine ja parandamine
+- Turvalisuse tagamine
+
+4. ANDMETE JAGAMINE
+
+Me ei jaga ega muü teie isikuandmeid kolmandatele osapooltele, vailja arvatud:
+- Kuulutustes avaldatud kontaktandmed on niihtavad koigile platvormi kasutajatele
+- Seadusest tulenevad kohustused (oiguskaitseorganite noudel)
+
+5. ANDMETE SAILITAMINE
+
+- Kasutajakonto andmeid sailitetakse kuni konto kustutamiseni
+- Kuulutuste andmeid sailitetakse kuni kuulutuse kustutamiseni
+- Serveri logisid sailitetakse kuni 90 paeva
+
+6. TEIE OIGUSED (GDPR)
+
+Teil on oigus:
+- Tutvuda oma isikuandmetega
+- Parandada ebakorrektseid andmeid
+- Noouda oma andmete kustutamist
+- Piirata andmete tootlemist
+- Esitada vastuvaited andmete tootlemise suhtes
+- Andmete ulekandmisele
+
+Oiguste kasutamiseks vota uhendust: tarmo@tardek.com
+
+7. TURVALISUS
+
+Kasutame erinevaid meetmeid teie andmete kaitsmiseks:
+- Paroolid on kruupteeritud (bcrypt hash)
+- HTTPS krüpteering kogu veebiliikluse jaoks
+- Regulaarne turvaauditeerimine
+
+8. MUUDATUSED
+
+Jatame endale oiguse seda privaatsuspoliitikat muuta. Oluliste muudatuste korral teavitame kasutajaid e-posti teel.
+
+Viimati uuendatud: 06.03.2026
