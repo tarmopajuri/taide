@@ -593,7 +593,7 @@
             .header-inner { padding: 8px 12px; gap: 8px; }
             .logo h1 { font-size: 22px; }
             .logo-img { width: 36px; height: 36px; }
-            .logo-subtitle { display: none; }
+            .logo-subtitle { font-size: 9px; }
 
             .mobile-menu-btn { display: block; }
 
@@ -639,6 +639,73 @@
             .listing-card { padding: 12px; }
             .listing-title { font-size: 14px; }
             .material-badge { font-size: 10px; padding: 2px 8px; }
+        }
+
+        /* ===== COOKIE CONSENT BANNER ===== */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 30, 30, 0.97);
+            color: #eee;
+            z-index: 9999;
+            padding: 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+        .cookie-banner.show { transform: translateY(0); }
+        .cookie-banner-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .cookie-text {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: var(--font-body);
+        }
+        .cookie-text a { color: #5BB139; text-decoration: underline; }
+        .cookie-text a:hover { color: #8FD974; }
+        .cookie-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .cookie-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-button);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .cookie-btn-accept {
+            background: #5BB139;
+            color: white;
+        }
+        .cookie-btn-accept:hover { background: #4A9030; }
+        .cookie-btn-decline {
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .cookie-btn-decline:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        @media (max-width: 768px) {
+            .cookie-banner-inner { flex-direction: column; padding: 16px; gap: 12px; }
+            .cookie-text { font-size: 12px; }
+            .cookie-buttons { width: 100%; }
+            .cookie-btn { flex: 1; text-align: center; padding: 12px 16px; }
         }
     </style>
 </head>
@@ -907,12 +974,23 @@
 
     <div class="toast" id="toast"></div>
 
+    <!-- Cookie consent banner -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-banner-inner">
+            <div class="cookie-text" id="cookieText"></div>
+            <div class="cookie-buttons">
+                <button class="cookie-btn cookie-btn-decline" id="cookieDecline" onclick="cookieConsent(false)"></button>
+                <button class="cookie-btn cookie-btn-accept" id="cookieAccept" onclick="cookieConsent(true)"></button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // ========== i18n TRANSLATIONS ==========
         const T = {
             et: {
-                subtitle: 'Jaga ehitusmaterjali',
+                subtitle: 'Jaga ülejäävat ehitus- ja täitematerjali',
                 login: 'Logi sisse', register: 'Registreeru', logout: 'Logi välja',
                 myListings: 'Minu kuulutused', addListing: 'Lisa kuulutus',
                 filterAll: 'Kõik', fStone: 'Kivi', fSand: 'Liiv', fSoil: 'Muld',
@@ -955,10 +1033,13 @@
                 priceFree: 'Tasuta', priceNegotiable: 'Hind kokkuleppel',
                 passwordsNoMatch: 'Paroolid ei kattu', passwordChanged: 'Parool edukalt muudetud!',
                 adminDeleteConfirm: 'Kas oled kindel? See kustutab LÕPLIKULT!',
-                imgTooBig: 'Pilt on liiga suur (max 5MB)', uploadFail: 'Pildi üleslaadimine ebaõnnestus'
+                imgTooBig: 'Pilt on liiga suur (max 5MB)', uploadFail: 'Pildi üleslaadimine ebaõnnestus',
+                cookieText: 'Fillio kasutab hädavajalikke küpsiseid platvormi toimimiseks ning kolmandate osapoolte teenuseid (OpenStreetMap kaardid, Google Fonts), mis võivad salvestada andmeid sinu seadmesse.',
+                cookieAccept: 'Nõustun', cookieDecline: 'Ainult vajalikud',
+                cookieLink: 'Küpsiste poliitika'
             },
             en: {
-                subtitle: 'Share construction materials',
+                subtitle: 'Share leftover construction and fill materials',
                 login: 'Log in', register: 'Register', logout: 'Log out',
                 myListings: 'My listings', addListing: 'Add listing',
                 filterAll: 'All', fStone: 'Stone', fSand: 'Sand', fSoil: 'Soil',
@@ -1001,7 +1082,10 @@
                 priceFree: 'Free', priceNegotiable: 'Price negotiable',
                 passwordsNoMatch: 'Passwords do not match', passwordChanged: 'Password changed!',
                 adminDeleteConfirm: 'Are you sure? This will PERMANENTLY delete!',
-                imgTooBig: 'Image too large (max 5MB)', uploadFail: 'Image upload failed'
+                imgTooBig: 'Image too large (max 5MB)', uploadFail: 'Image upload failed',
+                cookieText: 'Fillio uses essential cookies for platform functionality and third-party services (OpenStreetMap maps, Google Fonts) that may store data on your device.',
+                cookieAccept: 'Accept all', cookieDecline: 'Essential only',
+                cookieLink: 'Cookie policy'
             }
         };
 
@@ -1015,6 +1099,7 @@
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === l.toUpperCase()));
             applyTranslations();
             updateDocLinks();
+            updateCookieBanner();
             populateSelects();
             if (listings.length) renderListings();
         }
@@ -1438,6 +1523,30 @@
         function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
         // ========== INIT ==========
+        // ========== COOKIE CONSENT ==========
+        function updateCookieBanner() {
+            const textEl = document.getElementById('cookieText');
+            const acceptBtn = document.getElementById('cookieAccept');
+            const declineBtn = document.getElementById('cookieDecline');
+            const cookieLink = lang === 'en' ? '/static/docs/cookies_en.txt' : '/static/docs/kupsiste_poliitika.txt';
+            if (textEl) textEl.innerHTML = t('cookieText') + ' <a href="' + cookieLink + '" target="_blank">' + t('cookieLink') + '</a>';
+            if (acceptBtn) acceptBtn.textContent = t('cookieAccept');
+            if (declineBtn) declineBtn.textContent = t('cookieDecline');
+        }
+
+        function showCookieBanner() {
+            if (localStorage.getItem('fillio_cookies') !== null) return;
+            updateCookieBanner();
+            setTimeout(() => {
+                document.getElementById('cookieBanner').classList.add('show');
+            }, 800);
+        }
+
+        function cookieConsent(accepted) {
+            localStorage.setItem('fillio_cookies', accepted ? 'all' : 'essential');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             // Restore saved version
             const savedVersion = localStorage.getItem('fillio_version') || 'a';
@@ -1449,6 +1558,7 @@
             initGoogleLogin();
             const params = new URLSearchParams(window.location.search);
             if (params.get('reset_token')) openAuthModal('reset');
+            showCookieBanner();
         });
     </script>
 </body>

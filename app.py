@@ -311,28 +311,37 @@ def register():
     session['user_id'] = user['id']
 
     # Send welcome email
-    send_email(email, 'Tere tulemast Fillio platvormile!', f"""
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #1b4332; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px;">Fillio</h1>
-            <p style="margin: 5px 0 0; opacity: 0.8;">Ehitusmaterjali jagamise platvorm</p>
+    send_email(email, 'Tere tulemast Fillio platvormile! Sinu konto on loodud', f"""
+    <div style="font-family: 'Open Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa;">
+        <div style="background: linear-gradient(135deg, #3A7025, #4A9030); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 32px; font-family: 'Montserrat', Arial, sans-serif; letter-spacing: -0.5px;">Fillio</h1>
+            <p style="margin: 8px 0 0; opacity: 0.85; font-size: 14px;">Jaga ülejäävat ehitus- ja täitematerjali</p>
         </div>
-        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
-            <h2 style="color: #1b4332;">Tere, {username}!</h2>
-            <p>Sinu konto on edukalt loodud. Nüüd saad:</p>
-            <ul>
-                <li>Lisada kuulutusi ülejäänud ehitusmaterjalide kohta</li>
-                <li>Hallata oma kuulutusi</li>
-                <li>Leida tasuta ehitusmaterjale</li>
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb;">
+            <h2 style="color: #3A7025; margin: 0 0 16px; font-family: 'Montserrat', Arial, sans-serif;">Tere, {username}!</h2>
+            <p style="color: #333; line-height: 1.6; margin: 0 0 16px;">Sinu konto Fillio platvormil on edukalt loodud. Oled nüüd osa kogukonnast, mis aitab vähendada ehitusmaterjali raiskamist!</p>
+            <p style="color: #333; line-height: 1.6; margin: 0 0 8px; font-weight: 600;">Mida saad Fillio platvormil teha:</p>
+            <ul style="color: #555; line-height: 1.8; margin: 0 0 24px; padding-left: 20px;">
+                <li>Lisa kuulutusi ülejäävate ehitusmaterjalide kohta</li>
+                <li>Otsi tasuta või soodsaid ehitusmaterjale</li>
+                <li>Halda oma kuulutusi ja kontaktandmeid</li>
+                <li>Sirvi interaktiivsel kaardil materjale oma piirkonnas</li>
             </ul>
-            <p style="margin-top: 20px;">
-                <a href="https://fillio.eu" style="background: #2d6a4f; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-                    Ava Fillio
+            <p style="text-align: center; margin: 24px 0;">
+                <a href="https://fillio.eu" style="background: #5BB139; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block;">
+                    Logi sisse
                 </a>
             </p>
-            <p style="color: #999; font-size: 12px; margin-top: 30px;">
-                See kiri saadeti automaatselt fillio.eu poolt. Kui sa ei loonud kontot, ignoreeri seda kirja.
+        </div>
+        <div style="background: #fef3c7; padding: 16px 24px; border-left: 4px solid #f59e0b; border-right: 1px solid #e5e7eb;">
+            <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+                &#9888;&#65039; <strong>Turvalisuse märkus:</strong> Kui sa ei loonud Fillio kontot, palun võta meiega kohe ühendust aadressil
+                <a href="mailto:tarmo@tardek.com" style="color: #92400e;">tarmo@tardek.com</a>.
             </p>
+        </div>
+        <div style="background: #f3f4f6; padding: 20px 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none; text-align: center;">
+            <p style="color: #6b7280; font-size: 12px; margin: 0 0 8px;">Küsimuste korral: <a href="mailto:tarmo@tardek.com" style="color: #5BB139;">tarmo@tardek.com</a></p>
+            <p style="color: #9ca3af; font-size: 11px; margin: 0;">&copy; 2026 Fillio &middot; Tardek &middot; <a href="https://fillio.eu" style="color: #9ca3af;">fillio.eu</a></p>
         </div>
     </div>
     """)
@@ -400,23 +409,30 @@ def forgot_password():
     # Send reset email
     reset_url = f"https://fillio.eu?reset_token={token}"
     send_email(email, 'Fillio - parooli taastamine', f"""
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #1b4332; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px;">Fillio</h1>
+    <div style="font-family: 'Open Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa;">
+        <div style="background: linear-gradient(135deg, #3A7025, #4A9030); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 32px; font-family: 'Montserrat', Arial, sans-serif;">Fillio</h1>
+            <p style="margin: 8px 0 0; opacity: 0.85; font-size: 14px;">Jaga ülejäävat ehitus- ja täitematerjali</p>
         </div>
-        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
-            <h2 style="color: #1b4332;">Parooli taastamine</h2>
-            <p>Tere, {user['username']}!</p>
-            <p>Keegi (loodetavasti sina) soovis taastada sinu Fillio konto parooli.</p>
-            <p style="margin-top: 20px;">
-                <a href="{reset_url}" style="background: #2d6a4f; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb;">
+            <h2 style="color: #3A7025; margin: 0 0 16px; font-family: 'Montserrat', Arial, sans-serif;">Parooli taastamine</h2>
+            <p style="color: #333; line-height: 1.6; margin: 0 0 8px;">Tere, {user['username']}!</p>
+            <p style="color: #333; line-height: 1.6; margin: 0 0 24px;">Keegi (loodetavasti sina) soovis taastada sinu Fillio konto parooli. Kliki allolevale nupule uue parooli seadmiseks:</p>
+            <p style="text-align: center; margin: 24px 0;">
+                <a href="{reset_url}" style="background: #5BB139; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block;">
                     Taasta parool
                 </a>
             </p>
-            <p style="color: #666; margin-top: 20px;">See link kehtib 1 tunni.</p>
-            <p style="color: #999; font-size: 12px; margin-top: 30px;">
-                Kui sa ei soovinud parooli taastada, ignoreeri seda kirja.
+            <p style="color: #666; font-size: 13px; margin: 16px 0 0; text-align: center;">See link kehtib 1 tunni.</p>
+        </div>
+        <div style="background: #fef3c7; padding: 16px 24px; border-left: 4px solid #f59e0b; border-right: 1px solid #e5e7eb;">
+            <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+                &#9888;&#65039; Kui sa ei soovinud parooli taastada, ignoreeri seda kirja. Sinu konto on turvaline.
             </p>
+        </div>
+        <div style="background: #f3f4f6; padding: 20px 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none; text-align: center;">
+            <p style="color: #6b7280; font-size: 12px; margin: 0 0 8px;">Küsimuste korral: <a href="mailto:tarmo@tardek.com" style="color: #5BB139;">tarmo@tardek.com</a></p>
+            <p style="color: #9ca3af; font-size: 11px; margin: 0;">&copy; 2026 Fillio &middot; Tardek &middot; <a href="https://fillio.eu" style="color: #9ca3af;">fillio.eu</a></p>
         </div>
     </div>
     """)
@@ -503,17 +519,37 @@ def google_auth():
         session['user_id'] = user['id']
 
         # Send welcome email
-        send_email(email, 'Tere tulemast Fillio platvormile!', f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: #1b4332; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
-                <h1 style="margin: 0; font-size: 28px;">Fillio</h1>
+        send_email(email, 'Tere tulemast Fillio platvormile! Sinu konto on loodud', f"""
+        <div style="font-family: 'Open Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa;">
+            <div style="background: linear-gradient(135deg, #3A7025, #4A9030); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="margin: 0; font-size: 32px; font-family: 'Montserrat', Arial, sans-serif;">Fillio</h1>
+                <p style="margin: 8px 0 0; opacity: 0.85; font-size: 14px;">Jaga ülejäävat ehitus- ja täitematerjali</p>
             </div>
-            <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
-                <h2 style="color: #1b4332;">Tere, {name}!</h2>
-                <p>Sinu konto on loodud Google kontoga. Tere tulemast!</p>
-                <p style="margin-top: 20px;">
-                    <a href="https://fillio.eu" style="background: #2d6a4f; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ava Fillio</a>
+            <div style="background: white; padding: 30px; border: 1px solid #e5e7eb;">
+                <h2 style="color: #3A7025; margin: 0 0 16px; font-family: 'Montserrat', Arial, sans-serif;">Tere, {name}!</h2>
+                <p style="color: #333; line-height: 1.6; margin: 0 0 16px;">Sinu konto on edukalt loodud Google konto kaudu. Oled nüüd osa kogukonnast, mis aitab vähendada ehitusmaterjali raiskamist!</p>
+                <p style="color: #333; line-height: 1.6; margin: 0 0 8px; font-weight: 600;">Mida saad Fillio platvormil teha:</p>
+                <ul style="color: #555; line-height: 1.8; margin: 0 0 24px; padding-left: 20px;">
+                    <li>Lisa kuulutusi ülejäävate ehitusmaterjalide kohta</li>
+                    <li>Otsi tasuta või soodsaid ehitusmaterjale</li>
+                    <li>Halda oma kuulutusi ja kontaktandmeid</li>
+                    <li>Sirvi interaktiivsel kaardil materjale oma piirkonnas</li>
+                </ul>
+                <p style="text-align: center; margin: 24px 0;">
+                    <a href="https://fillio.eu" style="background: #5BB139; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block;">
+                        Logi sisse
+                    </a>
                 </p>
+            </div>
+            <div style="background: #fef3c7; padding: 16px 24px; border-left: 4px solid #f59e0b; border-right: 1px solid #e5e7eb;">
+                <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+                    &#9888;&#65039; <strong>Turvalisuse märkus:</strong> Kui sa ei loonud Fillio kontot, palun võta meiega kohe ühendust aadressil
+                    <a href="mailto:tarmo@tardek.com" style="color: #92400e;">tarmo@tardek.com</a>.
+                </p>
+            </div>
+            <div style="background: #f3f4f6; padding: 20px 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none; text-align: center;">
+                <p style="color: #6b7280; font-size: 12px; margin: 0 0 8px;">Küsimuste korral: <a href="mailto:tarmo@tardek.com" style="color: #5BB139;">tarmo@tardek.com</a></p>
+                <p style="color: #9ca3af; font-size: 11px; margin: 0;">&copy; 2026 Fillio &middot; Tardek &middot; <a href="https://fillio.eu" style="color: #9ca3af;">fillio.eu</a></p>
             </div>
         </div>
         """)
