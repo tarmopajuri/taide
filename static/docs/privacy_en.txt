@@ -1,0 +1,75 @@
+FILLIO PRIVACY POLICY
+Effective from: 06.03.2026
+
+1. GENERAL INFORMATION
+
+Fillio (fillio.eu) is a construction material sharing platform managed by Tardek.
+Data controller: Tardek
+Contact: tarmo@tardek.com
+Website: https://fillio.eu
+
+This privacy policy describes how we collect, use, and protect your personal data in accordance with the European Union General Data Protection Regulation (GDPR).
+
+2. WHAT DATA WE COLLECT
+
+2.1. When creating an account:
+- Name (username)
+- Email address
+- Password (stored in encrypted form)
+
+2.2. When adding a listing:
+- Contact person's name
+- Phone number (optional)
+- Email address (optional)
+- Address / location (coordinates)
+- Uploaded images
+
+2.3. Automatically collected data:
+- Session cookies (for login)
+- IP address (server logs)
+
+3. PURPOSES OF DATA USE
+
+Your data is used for the following purposes:
+- Managing and authenticating user accounts
+- Publishing and managing listings
+- Enabling communication between users
+- Ensuring and improving platform functionality
+- Ensuring security
+
+4. DATA SHARING
+
+We do not share or sell your personal data to third parties, except:
+- Contact information published in listings is visible to all platform users
+- Legal obligations (upon request by law enforcement authorities)
+
+5. DATA RETENTION
+
+- User account data is retained until the account is deleted
+- Listing data is retained until the listing is deleted
+- Server logs are retained for up to 90 days
+
+6. YOUR RIGHTS (GDPR)
+
+You have the right to:
+- Access your personal data
+- Correct inaccurate data
+- Request deletion of your data
+- Restrict data processing
+- Object to data processing
+- Data portability
+
+To exercise your rights, contact: tarmo@tardek.com
+
+7. SECURITY
+
+We use various measures to protect your data:
+- Passwords are encrypted (bcrypt hash)
+- HTTPS encryption for all web traffic
+- Regular security auditing
+
+8. CHANGES
+
+We reserve the right to modify this privacy policy. Users will be notified by email of significant changes.
+
+Last updated: 06.03.2026

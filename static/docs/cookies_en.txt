@@ -1,0 +1,47 @@
+FILLIO COOKIE POLICY
+Effective from: 06.03.2026
+
+1. WHAT ARE COOKIES?
+
+Cookies are small text files that a website stores on your device. They help the website remember your preferences and provide a better user experience.
+
+2. WHAT COOKIES WE USE
+
+2.1. Essential cookies (session cookies)
+- Purpose: Managing login sessions
+- Duration: Until browser is closed or session expires
+- Type: First-party cookie
+- Required: Yes, necessary for platform functionality
+
+2.2. Third-party cookies
+
+a) OpenStreetMap / Leaflet map service:
+- Purpose: Displaying interactive maps
+- Provider: OpenStreetMap Foundation
+- More info: https://wiki.openstreetmap.org/wiki/Privacy_Policy
+
+b) Google Fonts:
+- Purpose: Loading web fonts
+- Provider: Google LLC
+- More info: https://policies.google.com/privacy
+
+3. MANAGING COOKIES
+
+You can manage cookies in your browser settings:
+- Chrome: Settings > Privacy and Security > Cookies
+- Firefox: Settings > Privacy and Security
+- Safari: Preferences > Privacy
+- Edge: Settings > Cookies and Site Permissions
+
+Note: Blocking essential cookies may prevent the platform from functioning properly (e.g., login will not work).
+
+4. ANALYTICS
+
+We currently do not use separate analytics services (e.g., Google Analytics). If this changes in the future, we will update this policy accordingly.
+
+5. CONTACT
+
+For cookie-related questions:
+Email: tarmo@tardek.com
+
+Last updated: 06.03.2026

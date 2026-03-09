@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     {% if google_client_id %}
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     {% endif %}
@@ -48,33 +48,33 @@
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
             --radius: 12px;
 
-            /* Version A fonts (default) */
+            /* Version A fonts (default) - Startup klassika */
             --font-logo: 'Montserrat', sans-serif;
             --font-heading: 'Montserrat', sans-serif;
             --font-subheading: 'Montserrat', sans-serif;
-            --font-body: 'Poppins', sans-serif;
-            --font-button: 'Poppins', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+            --font-button: 'Open Sans', sans-serif;
 
             --weight-logo: 700;
             --weight-heading: 700;
             --weight-subheading: 600;
             --weight-body: 400;
-            --weight-button: 500;
+            --weight-button: 600;
         }
 
-        /* Version B overrides */
+        /* Version B overrides - Sõbralikum UX */
         body.version-b {
             --font-logo: 'Poppins', sans-serif;
             --font-heading: 'Poppins', sans-serif;
             --font-subheading: 'Poppins', sans-serif;
-            --font-body: 'Montserrat', sans-serif;
-            --font-button: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+            --font-button: 'Open Sans', sans-serif;
 
             --weight-logo: 700;
             --weight-heading: 600;
             --weight-subheading: 600;
             --weight-body: 400;
-            --weight-button: 500;
+            --weight-button: 600;
         }
 
         body {
@@ -716,9 +716,9 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-links">
-                <a href="/static/docs/reeglid.txt" target="_blank" data-t="rules"></a>
-                <a href="/static/docs/privaatsuspoliitika.txt" target="_blank" data-t="privacy"></a>
-                <a href="/static/docs/kupsiste_poliitika.txt" target="_blank" data-t="cookies"></a>
+                <a id="linkRules" href="/static/docs/reeglid.txt" target="_blank" data-t="rules"></a>
+                <a id="linkPrivacy" href="/static/docs/privaatsuspoliitika.txt" target="_blank" data-t="privacy"></a>
+                <a id="linkCookies" href="/static/docs/kupsiste_poliitika.txt" target="_blank" data-t="cookies"></a>
                 <a href="mailto:tarmo@tardek.com" data-t="contact"></a>
             </div>
             <p>&copy; 2026 Fillio. Tardek.</p>
@@ -913,49 +913,49 @@
         const T = {
             et: {
                 subtitle: 'Jaga ehitusmaterjali',
-                login: 'Logi sisse', register: 'Registreeru', logout: 'Logi valja',
+                login: 'Logi sisse', register: 'Registreeru', logout: 'Logi välja',
                 myListings: 'Minu kuulutused', addListing: 'Lisa kuulutus',
-                filterAll: 'Koik', fStone: 'Kivi', fSand: 'Liiv', fSoil: 'Muld',
+                filterAll: 'Kõik', fStone: 'Kivi', fSand: 'Liiv', fSoil: 'Muld',
                 fConcrete: 'Betoon', fGravel: 'Kruus', fOther: 'Muu',
                 searchPlaceholder: 'Otsi materjali, asukohta...',
-                addListingTitle: 'Lisa kuulutus', addListingSub: 'Jaga oma ulejaavat ehitusmaterjali teistega',
-                materialType: 'Materjali tuup', titleLabel: 'Pealkiri', titlePlaceholder: 'nt. Ehitusliiv tasuta',
-                descLabel: 'Kirjeldus', descPlaceholder: 'Kirjelda materjali lahemalt...',
-                quantityLabel: 'Kogus', unitLabel: 'Uhik', priceLabel: 'Hind',
+                addListingTitle: 'Lisa kuulutus', addListingSub: 'Jaga oma ülejäävat ehitusmaterjali teistega',
+                materialType: 'Materjali tüüp', titleLabel: 'Pealkiri', titlePlaceholder: 'nt. Ehitusliiv tasuta',
+                descLabel: 'Kirjeldus', descPlaceholder: 'Kirjelda materjali lähemalt...',
+                quantityLabel: 'Kogus', unitLabel: 'Ühik', priceLabel: 'Hind',
                 imageLabel: 'Pilt', clickToAdd: 'Kliki pildi lisamiseks',
                 contactTitle: 'Kontaktandmed', nameLabel: 'Nimi', namePlaceholder: 'Sinu nimi',
                 phoneLabel: 'Telefon', emailLabel: 'E-post', passwordLabel: 'Parool',
-                passwordPlaceholder: 'Parool', minChars: 'Vahemalt 6 marki',
-                locationTitle: 'Asukoht', addressLabel: 'Aadress', addressPlaceholder: 'Tanav, linn',
-                addressHelp: 'Kliki kaardil asukoha maaramiseks',
-                cancel: 'Tuhista', close: 'Sulge',
+                passwordPlaceholder: 'Parool', minChars: 'Vähemalt 6 märki',
+                locationTitle: 'Asukoht', addressLabel: 'Aadress', addressPlaceholder: 'Tänav, linn',
+                addressHelp: 'Kliki kaardil asukoha määramiseks',
+                cancel: 'Tühista', close: 'Sulge',
                 forgotPassword: 'Unustasid parooli?',
                 forgotDesc: 'Sisesta e-posti aadress ja saadame parooli taastamise lingi.',
                 sendReset: 'Saada taastamislink', backToLogin: 'Tagasi sisselogimisele',
                 resetDesc: 'Sisesta uus parool.', newPassword: 'Uus parool',
                 repeatPassword: 'Korda parooli', changePassword: 'Muuda parool',
                 googleLogin: 'Logi sisse Google kontoga', googleRegister: 'Registreeru Google kontoga',
-                orEmail: 'voi e-postiga',
+                orEmail: 'või e-postiga',
                 listings: 'Kuulutused', users: 'Kasutajad',
-                rules: 'Reeglid', privacy: 'Privaatsuspoliitika', cookies: 'Kupsiste poliitika', contact: 'Kontakt',
+                rules: 'Reeglid', privacy: 'Privaatsuspoliitika', cookies: 'Küpsiste poliitika', contact: 'Kontakt',
                 free: 'Tasuta', negotiable: 'Hind kokkuleppel', added: 'Lisatud',
                 deleteListing: 'Kustuta kuulutus', deleteConfirm: 'Kas oled kindel, et soovid kustutada?',
                 loginRequired: 'Palun logi sisse kuulutuse lisamiseks',
-                loggedIn: 'Sisse logitud!', registered: 'Registreerimine onnestus!',
-                loggedOut: 'Valja logitud!', listingAdded: 'Kuulutus edukalt lisatud!',
-                listingDeleted: 'Kuulutus kustutatud!', networkError: 'Vorgu viga',
+                loggedIn: 'Sisse logitud!', registered: 'Registreerimine õnnestus!',
+                loggedOut: 'Välja logitud!', listingAdded: 'Kuulutus edukalt lisatud!',
+                listingDeleted: 'Kuulutus kustutatud!', networkError: 'Võrgu viga',
                 noListings: 'Kuulutusi ei leitud', tryOther: 'Proovi teist filtrit',
                 noMyListings: 'Sul ei ole veel kuulutusi', addFirst: 'Lisa esimene kuulutus',
-                clickMap: 'Palun kliki kaardil asukoha maaramiseks!',
+                clickMap: 'Palun kliki kaardil asukoha määramiseks!',
                 active: 'Aktiivne', deleted: 'Kustutatud',
                 total: 'Kokku', listingsWord: 'kuulutust',
                 optStone: 'Kivi', optSand: 'Liiv', optSoil: 'Muld / kasvumuld',
                 optConcrete: 'Purustatud betoon', optGravel: 'Kruus', optOther: 'Muu',
-                unitTons: 'tonni', unitM3: 'm3', unitBags: 'kotti', unitLoads: 'koormaid',
+                unitTons: 'tonni', unitM3: 'm³', unitBags: 'kotti', unitLoads: 'koormaid',
                 priceFree: 'Tasuta', priceNegotiable: 'Hind kokkuleppel',
                 passwordsNoMatch: 'Paroolid ei kattu', passwordChanged: 'Parool edukalt muudetud!',
-                adminDeleteConfirm: 'Kas oled kindel? See kustutab LOPPLIKULT!',
-                imgTooBig: 'Pilt on liiga suur (max 5MB)', uploadFail: 'Pildi uleslaadimine ebaonnestus'
+                adminDeleteConfirm: 'Kas oled kindel? See kustutab LÕPLIKULT!',
+                imgTooBig: 'Pilt on liiga suur (max 5MB)', uploadFail: 'Pildi üleslaadimine ebaõnnestus'
             },
             en: {
                 subtitle: 'Share construction materials',
@@ -1014,8 +1014,24 @@
             localStorage.setItem('fillio_lang', l);
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === l.toUpperCase()));
             applyTranslations();
+            updateDocLinks();
             populateSelects();
             if (listings.length) renderListings();
+        }
+
+        function updateDocLinks() {
+            const r = document.getElementById('linkRules');
+            const p = document.getElementById('linkPrivacy');
+            const c = document.getElementById('linkCookies');
+            if (lang === 'en') {
+                if (r) r.href = '/static/docs/rules_en.txt';
+                if (p) p.href = '/static/docs/privacy_en.txt';
+                if (c) c.href = '/static/docs/cookies_en.txt';
+            } else {
+                if (r) r.href = '/static/docs/reeglid.txt';
+                if (p) p.href = '/static/docs/privaatsuspoliitika.txt';
+                if (c) c.href = '/static/docs/kupsiste_poliitika.txt';
+            }
         }
 
         function applyTranslations() {

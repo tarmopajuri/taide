@@ -1,75 +1,75 @@
 FILLIO PRIVAATSUSPOLIITIKA
 Kehtib alates: 06.03.2026
 
-1. ULDINFO
+1. ÜLDINFO
 
 Fillio (fillio.eu) on ehitusmaterjali jagamise platvorm, mida haldab Tardek.
-Vastutav tootleja: Tardek
+Vastutav töötleja: Tardek
 Kontakt: tarmo@tardek.com
 Veebileht: https://fillio.eu
 
-Kaesolev privaatsuspoliitika kirjeldab, kuidas me kogume, kasutame ja kaitseme teie isikuandmeid kooskolasEuroopa Liidu isikuandmete kaitse uldmaarusega (GDPR).
+Käesolev privaatsuspoliitika kirjeldab, kuidas me kogume, kasutame ja kaitseme teie isikuandmeid kooskõlas Euroopa Liidu isikuandmete kaitse üldmäärusega (GDPR).
 
 2. MILLISEID ANDMEID ME KOGUME
 
 2.1. Konto loomisel:
 - Nimi (kasutajanimi)
 - E-posti aadress
-- Parool (salvestatud kruupteeritud kujul)
+- Parool (salvestatud krüpteeritud kujul)
 
 2.2. Kuulutuse lisamisel:
 - Kontaktisiku nimi
 - Telefoninumber (valikuline)
 - E-posti aadress (valikuline)
 - Aadress / asukoht (koordinaadid)
-- Uleslaaditud pildid
+- Üleslaaditud pildid
 
 2.3. Automaatselt kogutavad andmed:
 - Sessiooniküpsised (sisselogimise jaoks)
 - IP-aadress (serveri logid)
 
-3. ANDMETE KASUTAMISE EESMARGID
+3. ANDMETE KASUTAMISE EESMÄRGID
 
-Teie andmeid kasutatakse jargmistel eesmärkidel:
+Teie andmeid kasutatakse järgmistel eesmärkidel:
 - Kasutajakonto haldamine ja autentimine
 - Kuulutuste avaldamine ja haldamine
-- Teiste kasutajatega suhtlemise voimal damine
+- Teiste kasutajatega suhtlemise võimaldamine
 - Platvormi toimimise tagamine ja parandamine
 - Turvalisuse tagamine
 
 4. ANDMETE JAGAMINE
 
-Me ei jaga ega muü teie isikuandmeid kolmandatele osapooltele, vailja arvatud:
-- Kuulutustes avaldatud kontaktandmed on niihtavad koigile platvormi kasutajatele
-- Seadusest tulenevad kohustused (oiguskaitseorganite noudel)
+Me ei jaga ega müü teie isikuandmeid kolmandatele osapooltele, välja arvatud:
+- Kuulutustes avaldatud kontaktandmed on nähtavad kõigile platvormi kasutajatele
+- Seadusest tulenevad kohustused (õiguskaitseorganite nõudel)
 
-5. ANDMETE SAILITAMINE
+5. ANDMETE SÄILITAMINE
 
-- Kasutajakonto andmeid sailitetakse kuni konto kustutamiseni
-- Kuulutuste andmeid sailitetakse kuni kuulutuse kustutamiseni
-- Serveri logisid sailitetakse kuni 90 paeva
+- Kasutajakonto andmeid säilitatakse kuni konto kustutamiseni
+- Kuulutuste andmeid säilitatakse kuni kuulutuse kustutamiseni
+- Serveri logisid säilitatakse kuni 90 päeva
 
-6. TEIE OIGUSED (GDPR)
+6. TEIE ÕIGUSED (GDPR)
 
-Teil on oigus:
+Teil on õigus:
 - Tutvuda oma isikuandmetega
 - Parandada ebakorrektseid andmeid
-- Noouda oma andmete kustutamist
-- Piirata andmete tootlemist
-- Esitada vastuvaited andmete tootlemise suhtes
-- Andmete ulekandmisele
+- Nõuda oma andmete kustutamist
+- Piirata andmete töötlemist
+- Esitada vastuväiteid andmete töötlemise suhtes
+- Andmete ülekandmisele
 
-Oiguste kasutamiseks vota uhendust: tarmo@tardek.com
+Õiguste kasutamiseks võta ühendust: tarmo@tardek.com
 
 7. TURVALISUS
 
 Kasutame erinevaid meetmeid teie andmete kaitsmiseks:
-- Paroolid on kruupteeritud (bcrypt hash)
-- HTTPS krüpteering kogu veebiliikluse jaoks
+- Paroolid on krüpteeritud (bcrypt hash)
+- HTTPS krüpteerimine kogu veebiliikluse jaoks
 - Regulaarne turvaauditeerimine
 
 8. MUUDATUSED
 
-Jatame endale oiguse seda privaatsuspoliitikat muuta. Oluliste muudatuste korral teavitame kasutajaid e-posti teel.
+Jätame endale õiguse seda privaatsuspoliitikat muuta. Oluliste muudatuste korral teavitame kasutajaid e-posti teel.
 
 Viimati uuendatud: 06.03.2026

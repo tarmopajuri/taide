@@ -1,19 +1,19 @@
-FILLIO KUPSISTE POLIITIKA
+FILLIO KÜPSISTE POLIITIKA
 Kehtib alates: 06.03.2026
 
-1. MIS ON KUPSISED?
+1. MIS ON KÜPSISED?
 
-Kupsised (cookies) on vaikesed tekstifailid, mida veebileht salvestab teie seadmesse. Need aitavad veebilehel meelde jatta teie eelistusi ja tagada parema kasutajakogemuse.
+Küpsised (cookies) on väikesed tekstifailid, mida veebileht salvestab teie seadmesse. Need aitavad veebilehel meelde jätta teie eelistusi ja tagada parema kasutajakogemuse.
 
-2. MILLISEID KUPSISEID ME KASUTAME
+2. MILLISEID KÜPSISEID ME KASUTAME
 
-2.1. Hädavajalikud kupsised (session cookies)
+2.1. Hädavajalikud küpsised (session cookies)
 - Eesmärk: Sisselogimise sessiooni haldamine
-- Kestvus: Kuni brauseri sulgemiseni voi sessiooni aegumiseni
-- Tüüp: Esimese osapoole kupsis
+- Kestvus: Kuni brauseri sulgemiseni või sessiooni aegumiseni
+- Tüüp: Esimese osapoole küpsis
 - Kohustuslik: Jah, platvormi toimimiseks vajalik
 
-2.2. Kolmandate osapoolte kupsised
+2.2. Kolmandate osapoolte küpsised
 
 a) OpenStreetMap / Leaflet kaarditeenus:
 - Eesmärk: Interaktiivse kaardi kuvamine
@@ -25,23 +25,23 @@ b) Google Fonts:
 - Pakkuja: Google LLC
 - Lisainfo: https://policies.google.com/privacy
 
-3. KUPSISTE HALDAMINE
+3. KÜPSISTE HALDAMINE
 
-Saate kupsiseid hallata oma brauseri seadetes:
-- Chrome: Seaded > Privaatsus ja turvalisus > Kupsised
+Saate küpsiseid hallata oma brauseri seadetes:
+- Chrome: Seaded > Privaatsus ja turvalisus > Küpsised
 - Firefox: Seaded > Privaatsus ja turvalisus
 - Safari: Eelistused > Privaatsus
-- Edge: Seaded > Kupsised ja saidi load
+- Edge: Seaded > Küpsised ja saidi load
 
-NB! Kohustuslike kupsiste blokeerimine voib takistada platvormi normaalset toimimist (nt sisselogimine ei toimi).
+NB! Kohustuslike küpsiste blokeerimine võib takistada platvormi normaalset toimimist (nt sisselogimine ei toimi).
 
-4. ANALUUTIKA
+4. ANALÜÜTIKA
 
-Hetkel me ei kasuta eraldi analuutika teenuseid (nt Google Analytics). Kui see tulevikus muutub, uuendame seda poliitikat vastavalt.
+Hetkel me ei kasuta eraldi analüütika teenuseid (nt Google Analytics). Kui see tulevikus muutub, uuendame seda poliitikat vastavalt.
 
 5. KONTAKT
 
-Kupsistega seotud kusimuste korral:
+Küpsistega seotud küsimuste korral:
 E-post: tarmo@tardek.com
 
 Viimati uuendatud: 06.03.2026
