@@ -116,7 +116,7 @@
             flex-shrink: 0;
         }
 
-        .logo-img { width: 48px; height: 48px; border-radius: 50%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .logo-img { width: 56px; height: 56px; border-radius: 12px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); background: white; padding: 2px; }
 
         .logo h1 {
             font-family: var(--font-logo);
@@ -633,7 +633,7 @@
         @media (max-width: 768px) {
             .header-inner { padding: 8px 12px; gap: 8px; }
             .logo h1 { font-size: 22px; }
-            .logo-img { width: 40px; height: 40px; }
+            .logo-img { width: 46px; height: 46px; }
             .logo-subtitle { font-size: 9px; }
 
             .mobile-menu-btn { display: block; }
@@ -843,7 +843,7 @@
     <header class="header">
         <div class="header-inner">
             <div class="logo" onclick="location.reload()">
-                <img src="/static/logo.svg" alt="Fillio" class="logo-img" onerror="this.style.display='none'">
+                <img src="/static/logo.png" alt="Fillio" class="logo-img" onerror="this.style.display='none'">
                 <div>
                     <h1><span class="green">Fill</span><span class="brown">io</span></h1>
                     <div class="logo-subtitle" data-t="subtitle"></div>
