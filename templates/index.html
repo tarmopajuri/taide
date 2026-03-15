@@ -453,6 +453,47 @@
         }
         #modal-map { height: 200px; border-radius: 10px; border: 2px solid var(--border); }
 
+        /* Address search autocomplete */
+        .address-search-wrap { position: relative; }
+        .address-suggestions {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border: 1px solid var(--border); border-radius: 0 0 10px 10px;
+            max-height: 200px; overflow-y: auto; z-index: 100;
+            box-shadow: var(--shadow-lg); display: none;
+        }
+        .address-suggestions.show { display: block; }
+        .address-suggestion {
+            padding: 10px 14px; cursor: pointer; font-size: 13px;
+            border-bottom: 1px solid var(--border-light);
+            font-family: var(--font-body); color: var(--text);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .address-suggestion:last-child { border-bottom: none; }
+        .address-suggestion:hover { background: #f0fdf4; color: var(--primary-darker); }
+        .address-suggestion .addr-icon { color: var(--primary); flex-shrink: 0; }
+        .address-search-btn {
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+            background: var(--primary); color: white; border: none; border-radius: 6px;
+            padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+            font-family: var(--font-button);
+        }
+        .address-search-btn:hover { background: var(--primary-dark); }
+
+        /* Map layer toggle */
+        .map-layer-toggle {
+            position: absolute; top: 10px; right: 10px; z-index: 500;
+            background: white; border-radius: 8px; box-shadow: var(--shadow-md);
+            overflow: hidden; display: flex;
+        }
+        .map-layer-btn {
+            padding: 6px 12px; border: none; background: white; cursor: pointer;
+            font-size: 11px; font-weight: 600; color: var(--text-light);
+            font-family: var(--font-button); transition: all 0.2s;
+            border-right: 1px solid var(--border-light);
+        }
+        .map-layer-btn:last-child { border-right: none; }
+        .map-layer-btn.active { background: var(--primary); color: white; }
+
         .image-upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .image-upload-area:hover { border-color: var(--primary); }
         .image-upload-area.has-image { padding: 0; border-style: solid; }
@@ -858,8 +899,12 @@
 
     <!-- Main content -->
     <div class="main">
-        <div class="map-container">
+        <div class="map-container" style="position:relative;">
             <div id="map"></div>
+            <div class="map-layer-toggle" id="mapLayerToggle">
+                <button class="map-layer-btn active" onclick="setMapLayer('street')" data-t-layer="street">Kaart</button>
+                <button class="map-layer-btn" onclick="setMapLayer('satellite')" data-t-layer="satellite">Satelliit</button>
+            </div>
         </div>
         <div class="listings-panel">
             <div class="listings-count" id="listingsCount"></div>
@@ -943,7 +988,11 @@
                 <div class="form-section-title">&#128205; <span data-t="locationTitle"></span></div>
                 <div class="form-group">
                     <label><span data-t="addressLabel"></span> <span class="required">*</span></label>
-                    <input type="text" name="address" id="addressInput" data-t-placeholder="addressPlaceholder" required>
+                    <div class="address-search-wrap">
+                        <input type="text" name="address" id="addressInput" data-t-placeholder="addressPlaceholder" required autocomplete="off" oninput="debounceAddressSearch()">
+                        <button type="button" class="address-search-btn" onclick="searchAddress()">&#128269;</button>
+                        <div class="address-suggestions" id="addressSuggestions"></div>
+                    </div>
                     <div class="form-help" data-t="addressHelp"></div>
                 </div>
                 <div class="form-group">
@@ -1105,7 +1154,9 @@
                 phoneLabel: 'Telefon', emailLabel: 'E-post', passwordLabel: 'Parool',
                 passwordPlaceholder: 'Parool', minChars: 'Vähemalt 6 märki',
                 locationTitle: 'Asukoht', addressLabel: 'Aadress', addressPlaceholder: 'Tänav, linn',
-                addressHelp: 'Kliki kaardil asukoha määramiseks',
+                addressHelp: 'Sisesta aadress ja vali nimekirjast, või kliki kaardil',
+                mapStreet: 'Kaart', mapSatellite: 'Satelliit',
+                searchingAddress: 'Otsin...',
                 cancel: 'Tühista', close: 'Sulge',
                 forgotPassword: 'Unustasid parooli?',
                 forgotDesc: 'Sisesta e-posti aadress ja saadame parooli taastamise lingi.',
@@ -1154,7 +1205,9 @@
                 phoneLabel: 'Phone', emailLabel: 'E-mail', passwordLabel: 'Password',
                 passwordPlaceholder: 'Password', minChars: 'At least 6 characters',
                 locationTitle: 'Location', addressLabel: 'Address', addressPlaceholder: 'Street, city',
-                addressHelp: 'Click on the map to set location',
+                addressHelp: 'Enter address and select from list, or click on map',
+                mapStreet: 'Map', mapSatellite: 'Satellite',
+                searchingAddress: 'Searching...',
                 cancel: 'Cancel', close: 'Close',
                 forgotPassword: 'Forgot password?',
                 forgotDesc: 'Enter your email and we will send a password reset link.',
@@ -1200,6 +1253,12 @@
             applyTranslations();
             updateCookieBanner();
             populateSelects();
+            // Update map layer buttons
+            document.querySelectorAll('#mapLayerToggle .map-layer-btn').forEach(b => {
+                const key = b.getAttribute('data-t-layer');
+                if (key === 'street') b.textContent = t('mapStreet');
+                if (key === 'satellite') b.textContent = t('mapSatellite');
+            });
             if (listings.length) renderListings();
         }
 
@@ -1496,9 +1555,31 @@
         }
 
         // ========== MAP ==========
+        let streetLayer, satelliteLayer, currentMapLayer = 'street';
+        let modalStreetLayer, modalSatelliteLayer;
+
+        function createLayers() {
+            streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 19 });
+            satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri', maxZoom: 19 });
+        }
+
+        function setMapLayer(type) {
+            currentMapLayer = type;
+            if (type === 'satellite') { map.removeLayer(streetLayer); satelliteLayer.addTo(map); }
+            else { map.removeLayer(satelliteLayer); streetLayer.addTo(map); }
+            document.querySelectorAll('#mapLayerToggle .map-layer-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-t-layer') === type));
+        }
+
         function initMap() {
+            createLayers();
             map = L.map('map').setView([58.8, 25.5], 7);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 18 }).addTo(map);
+            streetLayer.addTo(map);
+            // Update layer button text
+            document.querySelectorAll('#mapLayerToggle .map-layer-btn').forEach(b => {
+                const key = b.getAttribute('data-t-layer');
+                if (key === 'street') b.textContent = t('mapStreet');
+                if (key === 'satellite') b.textContent = t('mapSatellite');
+            });
             loadListings();
         }
 
@@ -1592,9 +1673,20 @@
             if (currentUser) { const form = document.getElementById('listingForm'); form.contact_name.value = currentUser.username || ''; form.contact_email.value = currentUser.email || ''; }
             setTimeout(() => {
                 if (!modalMap) {
+                    modalStreetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM', maxZoom: 19 });
+                    modalSatelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri', maxZoom: 19 });
                     modalMap = L.map('modal-map').setView([59.437, 24.7536], 11);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM', maxZoom: 18 }).addTo(modalMap);
-                    modalMap.on('click', function(e) { document.getElementById('latInput').value = e.latlng.lat.toFixed(6); document.getElementById('lngInput').value = e.latlng.lng.toFixed(6); if (modalMarker) modalMarker.setLatLng(e.latlng); else modalMarker = L.marker(e.latlng).addTo(modalMap); });
+                    modalStreetLayer.addTo(modalMap);
+                    // Layer toggle for modal map
+                    L.control.layers({ [t('mapStreet')]: modalStreetLayer, [t('mapSatellite')]: modalSatelliteLayer }, null, { position: 'topright', collapsed: false }).addTo(modalMap);
+                    modalMap.on('click', function(e) {
+                        document.getElementById('latInput').value = e.latlng.lat.toFixed(6);
+                        document.getElementById('lngInput').value = e.latlng.lng.toFixed(6);
+                        if (modalMarker) modalMarker.setLatLng(e.latlng);
+                        else modalMarker = L.marker(e.latlng).addTo(modalMap);
+                        // Reverse geocode to get address
+                        reverseGeocode(e.latlng.lat, e.latlng.lng);
+                    });
                 } else { modalMap.invalidateSize(); }
             }, 100);
         }
@@ -1602,6 +1694,7 @@
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('active'); document.body.style.overflow = '';
             document.getElementById('listingForm').reset();
+            hideAddressSuggestions();
             if (modalMarker) { modalMap.removeLayer(modalMarker); modalMarker = null; }
             ['latInput','lngInput'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('imageInput').value = '';
@@ -1610,6 +1703,88 @@
         }
 
         function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+        // ========== ADDRESS SEARCH (Nominatim geocoding) ==========
+        let addressSearchTimeout;
+
+        function debounceAddressSearch() {
+            clearTimeout(addressSearchTimeout);
+            const val = document.getElementById('addressInput').value.trim();
+            if (val.length < 3) { hideAddressSuggestions(); return; }
+            addressSearchTimeout = setTimeout(() => searchAddress(), 400);
+        }
+
+        async function searchAddress() {
+            const val = document.getElementById('addressInput').value.trim();
+            if (val.length < 2) return;
+            const suggestions = document.getElementById('addressSuggestions');
+            suggestions.innerHTML = `<div class="address-suggestion"><span style="color:var(--text-muted)">${t('searchingAddress')}</span></div>`;
+            suggestions.classList.add('show');
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&countrycodes=ee&limit=5&addressdetails=1`, {
+                    headers: { 'Accept-Language': lang }
+                });
+                const results = await res.json();
+                if (results.length === 0) {
+                    // Try without country code
+                    const res2 = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&limit=5&addressdetails=1`, {
+                        headers: { 'Accept-Language': lang }
+                    });
+                    const results2 = await res2.json();
+                    renderAddressSuggestions(results2);
+                } else {
+                    renderAddressSuggestions(results);
+                }
+            } catch (e) {
+                suggestions.classList.remove('show');
+            }
+        }
+
+        function renderAddressSuggestions(results) {
+            const suggestions = document.getElementById('addressSuggestions');
+            if (results.length === 0) {
+                suggestions.innerHTML = `<div class="address-suggestion"><span style="color:var(--text-muted)">&#128269; ${lang === 'et' ? 'Tulemusi ei leitud' : 'No results found'}</span></div>`;
+                return;
+            }
+            suggestions.innerHTML = results.map(r => `
+                <div class="address-suggestion" onclick="selectAddress('${escapeHtml(r.display_name)}', ${r.lat}, ${r.lon})">
+                    <span class="addr-icon">&#128205;</span>
+                    <span>${escapeHtml(r.display_name)}</span>
+                </div>`).join('');
+        }
+
+        function selectAddress(name, lat, lon) {
+            document.getElementById('addressInput').value = name;
+            document.getElementById('latInput').value = parseFloat(lat).toFixed(6);
+            document.getElementById('lngInput').value = parseFloat(lon).toFixed(6);
+            hideAddressSuggestions();
+            if (modalMap) {
+                modalMap.setView([lat, lon], 15);
+                if (modalMarker) modalMarker.setLatLng([lat, lon]);
+                else modalMarker = L.marker([lat, lon]).addTo(modalMap);
+            }
+        }
+
+        function hideAddressSuggestions() {
+            document.getElementById('addressSuggestions').classList.remove('show');
+        }
+
+        async function reverseGeocode(lat, lon) {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18`, {
+                    headers: { 'Accept-Language': lang }
+                });
+                const data = await res.json();
+                if (data.display_name) {
+                    document.getElementById('addressInput').value = data.display_name;
+                }
+            } catch (e) { /* silent */ }
+        }
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.address-search-wrap')) hideAddressSuggestions();
+        });
 
         function previewImage(input) {
             const file = input.files[0]; const area = document.getElementById('imageUploadArea'); const preview = document.getElementById('imagePreview');
